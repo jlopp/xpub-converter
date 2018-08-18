@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Bitcoin Extended Public Key Converter</title>
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <script src="js/browserified.js"></script>
+    <script>
+      function processForm() {
+        document.getElementById('output').innerHTML = changeVersionBytes(document.getElementById('xpub').value, document.getElementById('format').value);
+      }
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="text-center">Bitcoin Extended Public Key Converter</h1>
+      <hr>
+      <div class="row">
+        <div class="col-md-12">
+          <form class="form-horizontal" role="form">
+            <div class="form-group">
+              <div class="col-sm-2">
+              </div>
+              <div class="col-sm-10">
+                <p>You can enter any valid Bitcoin extended public key and convert it to another version of the same extended public key.</p>
+                <p>
+                  For more info see <a href="https://github.com/satoshilabs/slips/blob/master/slip-0132.md" target="_blank">SLIP-0132</a>.
+                </p>
+              </div>
+            </div>
+            <div class="form-group generate-container">
+              <label class="col-sm-2 control-label"></label>
+              <div class="col-sm-10">
+                <div class="form-inline">
+                  <div class="input-group-inline">
+                    <span>What version do you want to convert the extended public key into?</span><br/>
+                    <select id="format" class="format form-control">
+                      <option value="xpub" selected>xpub (mainnet P2PKH or P2SH)</option>
+                      <option value="ypub">ypub (mainnet P2WPKH in P2SH)</option>
+                      <option value="Ypub">Ypub (mainnet P2WSH in P2SH)</option>
+                      <option value="zpub">zpub (mainnet P2WPKH)</option>
+                      <option value="Zpub">Zpub (mainnet P2WSH)</option>
+                      <option value="tpub">tpub (testnet P2PKH or P2SH)</option>
+                      <option value="upub">upub (testnet P2WPKH in P2SH)</option>
+                      <option value="Upub">Upub (testnet P2WSH in P2SH)</option>
+                      <option value="vpub">vpub (testnet P2WPKH)</option>
+                      <option value="Vpub">Vpub (testnet P2WSH)</option>
+                    </select>
+                    <br/>
+                    Paste your extended public key here:<br/>
+                    <textarea id="xpub" rows="4" cols="50" style="width: 300px;height: 150px;"></textarea>
+                    <br/>
+                    <button class="btn" onclick="processForm();">Convert</button><br/><br/><br/>
+                    Converted extended public key:<br/>
+                    <div id="output" style="width: 300px;height: 150px;">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

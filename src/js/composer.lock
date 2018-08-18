@@ -1,0 +1,56 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "fca76953afa7a84c3c3b50113150d2b0",
+    "packages": [
+        {
+            "name": "stephenhill/base58",
+            "version": "v1.1.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/stephen-hill/base58php.git",
+                "reference": "75ef7128303def7629d2a4bf9ea9dc378140507c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/stephen-hill/base58php/zipball/75ef7128303def7629d2a4bf9ea9dc378140507c",
+                "reference": "75ef7128303def7629d2a4bf9ea9dc378140507c",
+                "shasum": ""
+            },
+            "require-dev": {
+                "athletic/athletic": "~0.1",
+                "phpunit/phpunit": "4.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "StephenHill\\": "src/",
+                    "StephenHill\\Benchmarks\\": "benchmarks/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Stephen Hill",
+                    "email": "stephen@gatekiller.co.uk"
+                }
+            ],
+            "description": "Base58 Encoding and Decoding Library for PHP",
+            "time": "2016-07-20T20:34:07+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": []
+}
