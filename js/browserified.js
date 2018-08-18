@@ -3071,8 +3071,8 @@ check.toJSON = function () { return 'witnessScriptHash input' }
 
 module.exports = { check }
 
-}).call(this,{"isBuffer":require("../../../../../../../../../../../usr/lib/node_modules/browserify/node_modules/is-buffer/index.js")})
-},{"../../../../../../../../../../../usr/lib/node_modules/browserify/node_modules/is-buffer/index.js":124,"../../script":25,"../../types":51,"../multisig/":28,"../pubkey/":32,"../pubkeyhash/":35,"typeforce":112}],48:[function(require,module,exports){
+}).call(this,{"isBuffer":require("../../../../../../../../../../usr/lib/node_modules/browserify/node_modules/is-buffer/index.js")})
+},{"../../../../../../../../../../usr/lib/node_modules/browserify/node_modules/is-buffer/index.js":124,"../../script":25,"../../types":51,"../multisig/":28,"../pubkey/":32,"../pubkeyhash/":35,"typeforce":112}],48:[function(require,module,exports){
 // OP_0 {scriptHash}
 
 const bscript = require('../../script')
@@ -15502,8 +15502,8 @@ for (var typeName in types) {
 
 module.exports = types
 
-}).call(this,{"isBuffer":require("../../../../../../../../usr/lib/node_modules/browserify/node_modules/is-buffer/index.js")})
-},{"../../../../../../../../usr/lib/node_modules/browserify/node_modules/is-buffer/index.js":124,"./errors":110,"./native":113}],112:[function(require,module,exports){
+}).call(this,{"isBuffer":require("../../../../../../../usr/lib/node_modules/browserify/node_modules/is-buffer/index.js")})
+},{"../../../../../../../usr/lib/node_modules/browserify/node_modules/is-buffer/index.js":124,"./errors":110,"./native":113}],112:[function(require,module,exports){
 var ERRORS = require('./errors')
 var NATIVE = require('./native')
 
@@ -15960,6 +15960,9 @@ global.changeVersionBytes = function(xpub, targetFormat) {
   if (!prefixes.has(targetFormat)) {
     return "Invalid target version";
   }
+
+  // trim whitespace
+  xpub = xpub.trim();
 
   try {
     var data = b58.decode(xpub);

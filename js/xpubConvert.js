@@ -32,6 +32,9 @@ global.changeVersionBytes = function(xpub, targetFormat) {
     return "Invalid target version";
   }
 
+  // trim whitespace
+  xpub = xpub.trim();
+
   try {
     var data = b58.decode(xpub);
     data = data.slice(4);
