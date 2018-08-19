@@ -26,7 +26,6 @@
     "unit": "tape test/*.js"
   },
   "dependencies": {
-    "bs58check": "^2.1.2",
-    "bitcoinjs-lib": "^4.0.1"
+    "bs58check": "^2.1.2"
   }
 }
