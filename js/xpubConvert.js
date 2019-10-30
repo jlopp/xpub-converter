@@ -40,6 +40,6 @@ global.changeVersionBytes = function(xpub, targetFormat) {
     data = Buffer.concat([Buffer.from(prefixes.get(targetFormat),'hex'), data]);
     return b58.encode(data);
   } catch (err) {
-    return "Invalid extended public key";
+    return "Invalid extended public key! Please double check that you didn't accidentally paste extra data.";
   }
 }
