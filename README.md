@@ -22,6 +22,11 @@ Standards
 -------
 This tool uses version bytes as described in [SLIP-0132](https://github.com/satoshilabs/slips/blob/master/slip-0132.md)
 
+Building
+-------
+Install browserify: http://browserify.org/
+run from the js/ directory: browserify xpubConvert.js -o browserified.js
+
 License
 -------
 

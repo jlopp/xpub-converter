@@ -1,14 +1,14 @@
 {
   "name": "prefix",
   "version": "2.1.2",
-  "description": "A straightforward implementation of base58-check encoding",
+  "description": "A straightforward implementation of extended public key version conversion",
   "keywords": [],
-  "homepage": "https://github.com/bitcoinjs/bs58check",
+  "homepage": "https://github.com/jlopp/xpub-converter",
   "bugs": {
-    "url": "https://github.com/bitcoinjs/bs58check/issues"
+    "url": "https://github.com/jlopp/xpub-converter/issues"
   },
   "license": "MIT",
-  "author": "Daniel Cousens",
+  "author": "Jameson Lopp",
   "files": [
     "index.js",
     "base.js"
@@ -16,7 +16,7 @@
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/bitcoinjs/bs58check.git"
+    "url": "https://github.com/jlopp/xpub-converter.git"
   },
   "scripts": {
     "coverage-report": "nyc report --reporter=lcov",
