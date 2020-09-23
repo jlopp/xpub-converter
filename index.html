@@ -18,6 +18,7 @@
     <script>
       function processForm() {
         document.getElementById('output').innerHTML = changeVersionBytes(document.getElementById('xpub').value, document.getElementById('format').value);
+        document.getElementById('fingerprint').innerHTML = getMasterFingerprint(document.getElementById('xpub').value, document.getElementById('format').value);
       }
     </script>
   </head>
@@ -61,9 +62,9 @@
                   <textarea id="xpub" rows="4" cols="50" style="width: 300px;height: 150px;"></textarea>
                   <br/>
                   <button class="btn" onclick="processForm();return false;">Convert</button><br/><br/><br/>
-                  Converted extended public key:<br/><br/><br/>
-                  <div id="output" style="width: 300px;height: 150px;">
-                  </div>
+                  Converted extended public key:<br/><br/>
+                  <span id="output"></span><br/><br/>
+                  Master fingerprint: <span id="fingerprint"></span>
                 </div>
               </div>
             </div>
