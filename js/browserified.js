@@ -12030,8 +12030,8 @@ global.changeVersionBytes = function (xpub, targetFormat) {
   }
 };
 
-global.getMasterFingerprint = function (xpub) {
-  return toHexString(bip32.fromBase58(xpub, NETWORK_TYPES['xpub']).fingerprint);
+global.getMasterFingerprint = function (xpub, targetFormat) {
+  return toHexString(bip32.fromBase58(changeVersionBytes(xpub, targetFormat), NETWORK_TYPES[targetFormat]).fingerprint);
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
