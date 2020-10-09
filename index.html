@@ -18,7 +18,8 @@
     <script>
       function processForm() {
         document.getElementById('output').innerHTML = changeVersionBytes(document.getElementById('xpub').value, document.getElementById('format').value);
-        document.getElementById('fingerprint').innerHTML = getMasterFingerprint(document.getElementById('xpub').value, document.getElementById('format').value);
+        document.getElementById('fingerprint').innerHTML = getFingerprint(document.getElementById('xpub').value, document.getElementById('format').value);
+        document.getElementById('parentFingerprint').innerHTML = getParentFingerprint(document.getElementById('xpub').value, document.getElementById('format').value);
       }
     </script>
   </head>
@@ -64,7 +65,8 @@
                   <button class="btn" onclick="processForm();return false;">Convert</button><br/><br/><br/>
                   Converted extended public key:<br/><br/>
                   <span id="output"></span><br/><br/>
-                  Master fingerprint: <span id="fingerprint"></span>
+                  Fingerprint: <span id="fingerprint"></span><br/>
+                  Parent Fingerprint: <span id="parentFingerprint"></span><br/>
                 </div>
               </div>
             </div>

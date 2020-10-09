@@ -134,7 +134,7 @@ export const NETWORK_TYPES = {
   }
 };
 
-function toHexString(byteArray) {
+function byteArrayToHexString(byteArray) {
   return Array.from(byteArray, function(byte) {
     return ('0' + (byte & 0xFF).toString(16)).slice(-2);
   }).join('')
@@ -164,6 +164,10 @@ global.changeVersionBytes = function(xpub, targetFormat) {
   }
 }
 
-global.getMasterFingerprint = function(xpub, targetFormat) {
-  return toHexString(bip32.fromBase58(changeVersionBytes(xpub, targetFormat), NETWORK_TYPES[targetFormat]).fingerprint);
+global.getFingerprint = function(xpub, targetFormat) {
+  return byteArrayToHexString(bip32.fromBase58(changeVersionBytes(xpub, targetFormat), NETWORK_TYPES[targetFormat]).fingerprint);
+}
+
+global.getParentFingerprint = function(xpub, targetFormat) {
+  return bip32.fromBase58(changeVersionBytes(xpub, targetFormat), NETWORK_TYPES[targetFormat]).parentFingerprint.toString(16);
 }
