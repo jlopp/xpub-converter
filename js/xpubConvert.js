@@ -171,3 +171,7 @@ global.getFingerprint = function(xpub, targetFormat) {
 global.getParentFingerprint = function(xpub, targetFormat) {
   return bip32.fromBase58(changeVersionBytes(xpub, targetFormat), NETWORK_TYPES[targetFormat]).parentFingerprint.toString(16);
 }
+
+global.getDepth = function(xpub, targetFormat) {
+  return bip32.fromBase58(changeVersionBytes(xpub, targetFormat), NETWORK_TYPES[targetFormat]).depth;
+}

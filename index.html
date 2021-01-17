@@ -20,6 +20,7 @@
         document.getElementById('output').innerHTML = changeVersionBytes(document.getElementById('xpub').value, document.getElementById('format').value);
         document.getElementById('fingerprint').innerHTML = getFingerprint(document.getElementById('xpub').value, document.getElementById('format').value);
         document.getElementById('parentFingerprint').innerHTML = getParentFingerprint(document.getElementById('xpub').value, document.getElementById('format').value);
+        document.getElementById('depth').innerHTML = getDepth(document.getElementById('xpub').value, document.getElementById('format').value);
       }
     </script>
   </head>
@@ -67,6 +68,7 @@
                   <span id="output"></span><br/><br/>
                   Fingerprint: <span id="fingerprint"></span><br/>
                   Parent Fingerprint: <span id="parentFingerprint"></span><br/>
+                  Depth: <span id="depth"></span><br/>
                 </div>
               </div>
             </div>
@@ -84,7 +86,7 @@
                 </a>
               </p>
               <p>
-                <span>This logic is also available as an npm modeule via </span>
+                <span>This logic is also available as an npm module via </span>
                 <a href="https://github.com/ExodusMovement/xpub-converter" target="_blank">
                 https://github.com/ExodusMovement/xpub-converter
                 </a>
