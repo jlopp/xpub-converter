@@ -3,8 +3,10 @@
   This script uses version bytes as described in SLIP-132
   https://github.com/satoshilabs/slips/blob/master/slip-0132.md
 */
-let b58 = require('bs58check');
-let bip32 = require('bip32')
+const b58 = require('bs58check');
+const ecc = require('@bitcoin-js/tiny-secp256k1-asmjs')
+const { BIP32Factory } = require('bip32')
+const bip32 = BIP32Factory(ecc)
 
 const prefixes = new Map(
   [

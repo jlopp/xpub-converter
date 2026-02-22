@@ -26,6 +26,7 @@
     "unit": "tape test/*.js"
   },
   "dependencies": {
+    "@bitcoin-js/tiny-secp256k1-asmjs": "^2.2.4",
     "bip32": "^5.0.1",
     "bs58check": "^2.1.2"
   },
