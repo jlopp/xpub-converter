@@ -26,16 +26,16 @@
     "unit": "tape test/*.js"
   },
   "dependencies": {
-    "bs58check": "^2.1.2",
-    "bip32": "^5.0.1"
+    "bip32": "^5.0.1",
+    "bs58check": "^2.1.2"
   },
   "devDependencies": {
     "@babel/core": "^7.11.6",
     "@babel/plugin-proposal-class-properties": "^7.10.4",
     "@babel/plugin-transform-runtime": "^7.11.5",
     "@babel/preset-env": "^7.11.5",
-    "@babel/preset-es2015": "^7.0.0-beta.53",
     "@babel/preset-react": "^7.10.4",
-    "babelify": "^10.0.0"
+    "babelify": "^10.0.0",
+    "esmify": "^2.1.1"
   }
 }
