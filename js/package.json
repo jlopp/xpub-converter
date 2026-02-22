@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "bs58check": "^2.1.2",
-    "bip32": "^2.0.5"
+    "bip32": "^5.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.11.6",
