@@ -31,12 +31,12 @@
     "bs58check": "^2.1.2"
   },
   "devDependencies": {
-    "@babel/core": "^7.11.6",
+    "@babel/core": "^7.23.2",
     "@babel/plugin-proposal-class-properties": "^7.10.4",
-    "@babel/plugin-transform-runtime": "^7.11.5",
-    "@babel/preset-env": "^7.11.5",
-    "@babel/preset-react": "^7.10.4",
+    "@babel/plugin-transform-runtime": "^7.23.2",
+    "@babel/preset-env": "^7.23.2",
+    "@babel/preset-react": "^7.23.2",
     "babelify": "^10.0.0",
-    "esmify": "^2.1.1"
+    "esmify": "^0.1.2"
   }
 }

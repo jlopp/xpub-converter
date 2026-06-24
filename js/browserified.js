@@ -64712,7 +64712,9 @@ exports.hmac = exports.HMAC = void 0;
  * HMAC: RFC2104 message authentication code.
  * @module
  */
+
 const utils_ts_1 = require("./utils.js");
+
 class HMAC extends utils_ts_1.Hash {
   constructor(hash, _key) {
     super();
@@ -64725,23 +64727,28 @@ class HMAC extends utils_ts_1.Hash {
     this.blockLen = this.iHash.blockLen;
     this.outputLen = this.iHash.outputLen;
     const blockLen = this.blockLen;
-    const pad = new Uint8Array(blockLen);
-    // blockLen can be bigger than outputLen
+    const pad = new Uint8Array(blockLen); // blockLen can be bigger than outputLen
+
     pad.set(key.length > blockLen ? hash.create().update(key).digest() : key);
+
     for (let i = 0; i < pad.length; i++) pad[i] ^= 0x36;
-    this.iHash.update(pad);
-    // By doing update (processing of first block) of outer hash here we can re-use it between multiple calls via clone
-    this.oHash = hash.create();
-    // Undo internal XOR && apply outer XOR
+
+    this.iHash.update(pad); // By doing update (processing of first block) of outer hash here we can re-use it between multiple calls via clone
+
+    this.oHash = hash.create(); // Undo internal XOR && apply outer XOR
+
     for (let i = 0; i < pad.length; i++) pad[i] ^= 0x36 ^ 0x5c;
+
     this.oHash.update(pad);
     (0, utils_ts_1.clean)(pad);
   }
+
   update(buf) {
     (0, utils_ts_1.aexists)(this);
     this.iHash.update(buf);
     return this;
   }
+
   digestInto(out) {
     (0, utils_ts_1.aexists)(this);
     (0, utils_ts_1.abytes)(out, this.outputLen);
@@ -64751,11 +64758,13 @@ class HMAC extends utils_ts_1.Hash {
     this.oHash.digestInto(out);
     this.destroy();
   }
+
   digest() {
     const out = new Uint8Array(this.oHash.outputLen);
     this.digestInto(out);
     return out;
   }
+
   _cloneInto(to) {
     // Create new instance without calling constructor since key already in state and we don't know it.
     to || (to = Object.create(Object.getPrototypeOf(this), {}));
@@ -64776,15 +64785,19 @@ class HMAC extends utils_ts_1.Hash {
     to.iHash = iHash._cloneInto(to.iHash);
     return to;
   }
+
   clone() {
     return this._cloneInto();
   }
+
   destroy() {
     this.destroyed = true;
     this.oHash.destroy();
     this.iHash.destroy();
   }
+
 }
+
 exports.HMAC = HMAC;
 /**
  * HMAC: RFC2104 message authentication code.
@@ -64796,8 +64809,11 @@ exports.HMAC = HMAC;
  * import { sha256 } from '@noble/hashes/sha2';
  * const mac1 = hmac(sha256, 'key', 'message');
  */
+
 const hmac = (hash, key, message) => new HMAC(hash, key).update(message).digest();
+
 exports.hmac = hmac;
+
 exports.hmac.create = (hash, key) => new HMAC(hash, key);
 
 },{"./utils.js":240}],235:[function(require,module,exports){
@@ -65102,10 +65118,14 @@ exports.ripemd160 = exports.RIPEMD160 = void 0;
  * @module
  * @deprecated
  */
+
 const legacy_ts_1 = require("./legacy.js");
 /** @deprecated Use import from `noble/hashes/legacy` module */
+
+
 exports.RIPEMD160 = legacy_ts_1.RIPEMD160;
 /** @deprecated Use import from `noble/hashes/legacy` module */
+
 exports.ripemd160 = legacy_ts_1.ripemd160;
 
 },{"./legacy.js":235}],237:[function(require,module,exports){
@@ -65510,14 +65530,20 @@ exports.sha224 = exports.SHA224 = exports.sha256 = exports.SHA256 = void 0;
  * @module
  * @deprecated
  */
+
 const sha2_ts_1 = require("./sha2.js");
 /** @deprecated Use import from `noble/hashes/sha2` module */
+
+
 exports.SHA256 = sha2_ts_1.SHA256;
 /** @deprecated Use import from `noble/hashes/sha2` module */
+
 exports.sha256 = sha2_ts_1.sha256;
 /** @deprecated Use import from `noble/hashes/sha2` module */
+
 exports.SHA224 = sha2_ts_1.SHA224;
 /** @deprecated Use import from `noble/hashes/sha2` module */
+
 exports.sha224 = sha2_ts_1.sha224;
 
 },{"./sha2.js":237}],239:[function(require,module,exports){
@@ -65535,32 +65561,43 @@ exports.sha512_256 = exports.SHA512_256 = exports.sha512_224 = exports.SHA512_22
  * @module
  * @deprecated
  */
+
 const sha2_ts_1 = require("./sha2.js");
 /** @deprecated Use import from `noble/hashes/sha2` module */
+
+
 exports.SHA512 = sha2_ts_1.SHA512;
 /** @deprecated Use import from `noble/hashes/sha2` module */
+
 exports.sha512 = sha2_ts_1.sha512;
 /** @deprecated Use import from `noble/hashes/sha2` module */
+
 exports.SHA384 = sha2_ts_1.SHA384;
 /** @deprecated Use import from `noble/hashes/sha2` module */
+
 exports.sha384 = sha2_ts_1.sha384;
 /** @deprecated Use import from `noble/hashes/sha2` module */
+
 exports.SHA512_224 = sha2_ts_1.SHA512_224;
 /** @deprecated Use import from `noble/hashes/sha2` module */
+
 exports.sha512_224 = sha2_ts_1.sha512_224;
 /** @deprecated Use import from `noble/hashes/sha2` module */
+
 exports.SHA512_256 = sha2_ts_1.SHA512_256;
 /** @deprecated Use import from `noble/hashes/sha2` module */
+
 exports.sha512_256 = sha2_ts_1.sha512_256;
 
 },{"./sha2.js":237}],240:[function(require,module,exports){
 "use strict";
-
 /**
  * Utilities for hex, bytes, CSPRNG.
  * @module
  */
+
 /*! noble-hashes - MIT License (c) 2022 Paul Miller (paulmillr.com) */
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -65591,95 +65628,130 @@ exports.checkOpts = checkOpts;
 exports.createHasher = createHasher;
 exports.createOptHasher = createOptHasher;
 exports.createXOFer = createXOFer;
-exports.randomBytes = randomBytes;
-// We use WebCrypto aka globalThis.crypto, which exists in browsers and node.js 16+.
+exports.randomBytes = randomBytes; // We use WebCrypto aka globalThis.crypto, which exists in browsers and node.js 16+.
 // node.js versions earlier than v19 don't declare it in global scope.
 // For node.js, package.json#exports field mapping rewrites import
 // from `crypto` to `cryptoNode`, which imports native module.
 // Makes the utils un-importable in browsers without a bundler.
 // Once node.js 18 is deprecated (2025-04-30), we can just drop the import.
+
 const crypto_1 = require("@noble/hashes/crypto");
 /** Checks if something is Uint8Array. Be careful: nodejs Buffer will return true. */
+
+
 function isBytes(a) {
   return a instanceof Uint8Array || ArrayBuffer.isView(a) && a.constructor.name === 'Uint8Array';
 }
 /** Asserts something is positive integer. */
+
+
 function anumber(n) {
   if (!Number.isSafeInteger(n) || n < 0) throw new Error('positive integer expected, got ' + n);
 }
 /** Asserts something is Uint8Array. */
+
+
 function abytes(b, ...lengths) {
   if (!isBytes(b)) throw new Error('Uint8Array expected');
   if (lengths.length > 0 && !lengths.includes(b.length)) throw new Error('Uint8Array expected of length ' + lengths + ', got length=' + b.length);
 }
 /** Asserts something is hash */
+
+
 function ahash(h) {
   if (typeof h !== 'function' || typeof h.create !== 'function') throw new Error('Hash should be wrapped by utils.createHasher');
   anumber(h.outputLen);
   anumber(h.blockLen);
 }
 /** Asserts a hash instance has not been destroyed / finished */
+
+
 function aexists(instance, checkFinished = true) {
   if (instance.destroyed) throw new Error('Hash instance has been destroyed');
   if (checkFinished && instance.finished) throw new Error('Hash#digest() has already been called');
 }
 /** Asserts output is properly-sized byte array */
+
+
 function aoutput(out, instance) {
   abytes(out);
   const min = instance.outputLen;
+
   if (out.length < min) {
     throw new Error('digestInto() expects output buffer of length at least ' + min);
   }
 }
 /** Cast u8 / u16 / u32 to u8. */
+
+
 function u8(arr) {
   return new Uint8Array(arr.buffer, arr.byteOffset, arr.byteLength);
 }
 /** Cast u8 / u16 / u32 to u32. */
+
+
 function u32(arr) {
   return new Uint32Array(arr.buffer, arr.byteOffset, Math.floor(arr.byteLength / 4));
 }
 /** Zeroize a byte array. Warning: JS provides no guarantees. */
+
+
 function clean(...arrays) {
   for (let i = 0; i < arrays.length; i++) {
     arrays[i].fill(0);
   }
 }
 /** Create DataView of an array for easy byte-level manipulation. */
+
+
 function createView(arr) {
   return new DataView(arr.buffer, arr.byteOffset, arr.byteLength);
 }
 /** The rotate right (circular right shift) operation for uint32 */
+
+
 function rotr(word, shift) {
   return word << 32 - shift | word >>> shift;
 }
 /** The rotate left (circular left shift) operation for uint32 */
+
+
 function rotl(word, shift) {
   return word << shift | word >>> 32 - shift >>> 0;
 }
 /** Is current platform little-endian? Most are. Big-Endian platform: IBM */
+
+
 exports.isLE = (() => new Uint8Array(new Uint32Array([0x11223344]).buffer)[0] === 0x44)();
 /** The byte swap operation for uint32 */
+
+
 function byteSwap(word) {
   return word << 24 & 0xff000000 | word << 8 & 0xff0000 | word >>> 8 & 0xff00 | word >>> 24 & 0xff;
 }
 /** Conditionally byte swap if on a big-endian platform */
+
+
 exports.swap8IfBE = exports.isLE ? n => n : n => byteSwap(n);
 /** @deprecated */
+
 exports.byteSwapIfBE = exports.swap8IfBE;
 /** In place byte swap for Uint32Array */
+
 function byteSwap32(arr) {
   for (let i = 0; i < arr.length; i++) {
     arr[i] = byteSwap(arr[i]);
   }
+
   return arr;
 }
-exports.swap32IfBE = exports.isLE ? u => u : byteSwap32;
-// Built-in hex conversion https://caniuse.com/mdn-javascript_builtins_uint8array_fromhex
-const hasHexBuiltin = /* @__PURE__ */(() =>
-// @ts-ignore
-typeof Uint8Array.from([]).toHex === 'function' && typeof Uint8Array.fromHex === 'function')();
-// Array where index 0xf0 (240) is mapped to string 'f0'
+
+exports.swap32IfBE = exports.isLE ? u => u : byteSwap32; // Built-in hex conversion https://caniuse.com/mdn-javascript_builtins_uint8array_fromhex
+
+const hasHexBuiltin = /* @__PURE__ */(() => // @ts-ignore
+typeof Uint8Array.from([]).toHex === 'function' && typeof Uint8Array.fromHex === 'function')(); // Array where index 0xf0 (240) is mapped to string 'f0'
+
+
 const hexes = /* @__PURE__ */Array.from({
   length: 256
 }, (_, i) => i.toString(16).padStart(2, '0'));
@@ -65687,18 +65759,22 @@ const hexes = /* @__PURE__ */Array.from({
  * Convert byte array to hex string. Uses built-in function, when available.
  * @example bytesToHex(Uint8Array.from([0xca, 0xfe, 0x01, 0x23])) // 'cafe0123'
  */
+
 function bytesToHex(bytes) {
-  abytes(bytes);
-  // @ts-ignore
-  if (hasHexBuiltin) return bytes.toHex();
-  // pre-caching improves the speed 6x
+  abytes(bytes); // @ts-ignore
+
+  if (hasHexBuiltin) return bytes.toHex(); // pre-caching improves the speed 6x
+
   let hex = '';
+
   for (let i = 0; i < bytes.length; i++) {
     hex += hexes[bytes[i]];
   }
+
   return hex;
-}
-// We use optimized technique to convert hex string to byte array
+} // We use optimized technique to convert hex string to byte array
+
+
 const asciis = {
   _0: 48,
   _9: 57,
@@ -65707,33 +65783,43 @@ const asciis = {
   a: 97,
   f: 102
 };
+
 function asciiToBase16(ch) {
   if (ch >= asciis._0 && ch <= asciis._9) return ch - asciis._0; // '2' => 50-48
+
   if (ch >= asciis.A && ch <= asciis.F) return ch - (asciis.A - 10); // 'B' => 66-(65-10)
+
   if (ch >= asciis.a && ch <= asciis.f) return ch - (asciis.a - 10); // 'b' => 98-(97-10)
+
   return;
 }
 /**
  * Convert hex string to byte array. Uses built-in function, when available.
  * @example hexToBytes('cafe0123') // Uint8Array.from([0xca, 0xfe, 0x01, 0x23])
  */
+
+
 function hexToBytes(hex) {
-  if (typeof hex !== 'string') throw new Error('hex string expected, got ' + typeof hex);
-  // @ts-ignore
+  if (typeof hex !== 'string') throw new Error('hex string expected, got ' + typeof hex); // @ts-ignore
+
   if (hasHexBuiltin) return Uint8Array.fromHex(hex);
   const hl = hex.length;
   const al = hl / 2;
   if (hl % 2) throw new Error('hex string expected, got unpadded hex of length ' + hl);
   const array = new Uint8Array(al);
+
   for (let ai = 0, hi = 0; ai < al; ai++, hi += 2) {
     const n1 = asciiToBase16(hex.charCodeAt(hi));
     const n2 = asciiToBase16(hex.charCodeAt(hi + 1));
+
     if (n1 === undefined || n2 === undefined) {
       const char = hex[hi] + hex[hi + 1];
       throw new Error('hex string expected, got non-hex character "' + char + '" at index ' + hi);
     }
+
     array[ai] = n1 * 16 + n2; // multiply first octet, e.g. 'a3' => 10*16+3 => 160 + 3 => 163
   }
+
   return array;
 }
 /**
@@ -65741,14 +65827,19 @@ function hexToBytes(hex) {
  * Call of async fn will return Promise, which will be fullfiled only on
  * next scheduler queue processing step and this is exactly what we need.
  */
+
+
 const nextTick = async () => {};
+
 exports.nextTick = nextTick;
 /** Returns control to thread each 'tick' ms to avoid blocking. */
+
 async function asyncLoop(iters, tick, cb) {
   let ts = Date.now();
+
   for (let i = 0; i < iters; i++) {
-    cb(i);
-    // Date.now() is not monotonic, so in case if clock goes backwards we return return control too
+    cb(i); // Date.now() is not monotonic, so in case if clock goes backwards we return return control too
+
     const diff = Date.now() - ts;
     if (diff >= 0 && diff < tick) continue;
     await (0, exports.nextTick)();
@@ -65759,6 +65850,8 @@ async function asyncLoop(iters, tick, cb) {
  * Converts string to bytes using UTF8 encoding.
  * @example utf8ToBytes('abc') // Uint8Array.from([97, 98, 99])
  */
+
+
 function utf8ToBytes(str) {
   if (typeof str !== 'string') throw new Error('string expected');
   return new Uint8Array(new TextEncoder().encode(str)); // https://bugzil.la/1681809
@@ -65767,6 +65860,8 @@ function utf8ToBytes(str) {
  * Converts bytes to string using UTF8 encoding.
  * @example bytesToUtf8(Uint8Array.from([97, 98, 99])) // 'abc'
  */
+
+
 function bytesToUtf8(bytes) {
   return new TextDecoder().decode(bytes);
 }
@@ -65775,6 +65870,8 @@ function bytesToUtf8(bytes) {
  * Warning: when Uint8Array is passed, it would NOT get copied.
  * Keep in mind for future mutable operations.
  */
+
+
 function toBytes(data) {
   if (typeof data === 'string') data = utf8ToBytes(data);
   abytes(data);
@@ -65784,72 +65881,100 @@ function toBytes(data) {
  * Helper for KDFs: consumes uint8array or string.
  * When string is passed, does utf8 decoding, using TextDecoder.
  */
+
+
 function kdfInputToBytes(data) {
   if (typeof data === 'string') data = utf8ToBytes(data);
   abytes(data);
   return data;
 }
 /** Copies several Uint8Arrays into one. */
+
+
 function concatBytes(...arrays) {
   let sum = 0;
+
   for (let i = 0; i < arrays.length; i++) {
     const a = arrays[i];
     abytes(a);
     sum += a.length;
   }
+
   const res = new Uint8Array(sum);
+
   for (let i = 0, pad = 0; i < arrays.length; i++) {
     const a = arrays[i];
     res.set(a, pad);
     pad += a.length;
   }
+
   return res;
 }
+
 function checkOpts(defaults, opts) {
   if (opts !== undefined && {}.toString.call(opts) !== '[object Object]') throw new Error('options should be object or undefined');
   const merged = Object.assign(defaults, opts);
   return merged;
 }
 /** For runtime check if class implements interface */
+
+
 class Hash {}
+
 exports.Hash = Hash;
 /** Wraps hash function, creating an interface on top of it */
+
 function createHasher(hashCons) {
   const hashC = msg => hashCons().update(toBytes(msg)).digest();
+
   const tmp = hashCons();
   hashC.outputLen = tmp.outputLen;
   hashC.blockLen = tmp.blockLen;
+
   hashC.create = () => hashCons();
+
   return hashC;
 }
+
 function createOptHasher(hashCons) {
   const hashC = (msg, opts) => hashCons(opts).update(toBytes(msg)).digest();
+
   const tmp = hashCons({});
   hashC.outputLen = tmp.outputLen;
   hashC.blockLen = tmp.blockLen;
+
   hashC.create = opts => hashCons(opts);
+
   return hashC;
 }
+
 function createXOFer(hashCons) {
   const hashC = (msg, opts) => hashCons(opts).update(toBytes(msg)).digest();
+
   const tmp = hashCons({});
   hashC.outputLen = tmp.outputLen;
   hashC.blockLen = tmp.blockLen;
+
   hashC.create = opts => hashCons(opts);
+
   return hashC;
 }
+
 exports.wrapConstructor = createHasher;
 exports.wrapConstructorWithOpts = createOptHasher;
 exports.wrapXOFConstructorWithOpts = createXOFer;
 /** Cryptographically secure PRNG. Uses internal OS-level `crypto.getRandomValues`. */
+
 function randomBytes(bytesLength = 32) {
   if (crypto_1.crypto && typeof crypto_1.crypto.getRandomValues === 'function') {
     return crypto_1.crypto.getRandomValues(new Uint8Array(bytesLength));
-  }
-  // Legacy Node.js compatibility
+  } // Legacy Node.js compatibility
+
+
   if (crypto_1.crypto && typeof crypto_1.crypto.randomBytes === 'function') {
     return Uint8Array.from(crypto_1.crypto.randomBytes(bytesLength));
   }
+
   throw new Error('crypto.getRandomValues must be defined');
 }
 
@@ -65859,56 +65984,71 @@ function randomBytes(bytesLength = 32) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.bytes = exports.stringToBytes = exports.str = exports.bytesToString = exports.hex = exports.utf8 = exports.bech32m = exports.bech32 = exports.base58check = exports.createBase58check = exports.base58xmr = exports.base58xrp = exports.base58flickr = exports.base58 = exports.base64urlnopad = exports.base64url = exports.base64nopad = exports.base64 = exports.base32crockford = exports.base32hexnopad = exports.base32hex = exports.base32nopad = exports.base32 = exports.base16 = exports.utils = void 0;
+exports.utils = exports.utf8 = exports.stringToBytes = exports.str = exports.hex = exports.createBase58check = exports.bytesToString = exports.bytes = exports.bech32m = exports.bech32 = exports.base64urlnopad = exports.base64url = exports.base64nopad = exports.base64 = exports.base58xrp = exports.base58xmr = exports.base58flickr = exports.base58check = exports.base58 = exports.base32nopad = exports.base32hexnopad = exports.base32hex = exports.base32crockford = exports.base32 = exports.base16 = void 0;
+
 /*! scure-base - MIT License (c) 2022 Paul Miller (paulmillr.com) */
 function isBytes(a) {
   return a instanceof Uint8Array || ArrayBuffer.isView(a) && a.constructor.name === 'Uint8Array';
 }
 /** Asserts something is Uint8Array. */
+
+
 function abytes(b, ...lengths) {
   if (!isBytes(b)) throw new Error('Uint8Array expected');
   if (lengths.length > 0 && !lengths.includes(b.length)) throw new Error('Uint8Array expected of length ' + lengths + ', got length=' + b.length);
 }
+
 function isArrayOf(isString, arr) {
   if (!Array.isArray(arr)) return false;
   if (arr.length === 0) return true;
+
   if (isString) {
     return arr.every(item => typeof item === 'string');
   } else {
     return arr.every(item => Number.isSafeInteger(item));
   }
-}
-// no abytes: seems to have 10% slowdown. Why?!
+} // no abytes: seems to have 10% slowdown. Why?!
+
+
 function afn(input) {
   if (typeof input !== 'function') throw new Error('function expected');
   return true;
 }
+
 function astr(label, input) {
   if (typeof input !== 'string') throw new Error(`${label}: string expected`);
   return true;
 }
+
 function anumber(n) {
   if (!Number.isSafeInteger(n)) throw new Error(`invalid integer: ${n}`);
 }
+
 function aArr(input) {
   if (!Array.isArray(input)) throw new Error('array expected');
 }
+
 function astrArr(label, input) {
   if (!isArrayOf(true, input)) throw new Error(`${label}: array of strings expected`);
 }
+
 function anumArr(label, input) {
   if (!isArrayOf(false, input)) throw new Error(`${label}: array of numbers expected`);
 }
 /**
  * @__NO_SIDE_EFFECTS__
  */
+
+
 function chain(...args) {
-  const id = a => a;
-  // Wrap call in closure so JIT can inline calls
-  const wrap = (a, b) => c => a(b(c));
-  // Construct chain of args[-1].encode(args[-2].encode([...]))
-  const encode = args.map(x => x.encode).reduceRight(wrap, id);
-  // Construct chain of args[0].decode(args[1].decode(...))
+  const id = a => a; // Wrap call in closure so JIT can inline calls
+
+
+  const wrap = (a, b) => c => a(b(c)); // Construct chain of args[-1].encode(args[-2].encode([...]))
+
+
+  const encode = args.map(x => x.encode).reduceRight(wrap, id); // Construct chain of args[0].decode(args[1].decode(...))
+
   const decode = args.map(x => x.decode).reduce(wrap, id);
   return {
     encode,
@@ -65920,12 +66060,14 @@ function chain(...args) {
  * Could also be array of strings.
  * @__NO_SIDE_EFFECTS__
  */
+
+
 function alphabet(letters) {
   // mapping 1 to "b"
   const lettersA = typeof letters === 'string' ? letters.split('') : letters;
   const len = lettersA.length;
-  astrArr('alphabet', lettersA);
-  // mapping "b" to 1
+  astrArr('alphabet', lettersA); // mapping "b" to 1
+
   const indexes = new Map(lettersA.map((l, i) => [l, i]));
   return {
     encode: digits => {
@@ -65949,6 +66091,8 @@ function alphabet(letters) {
 /**
  * @__NO_SIDE_EFFECTS__
  */
+
+
 function join(separator = '') {
   astr('join', separator);
   return {
@@ -65966,31 +66110,41 @@ function join(separator = '') {
  * Pad strings array so it has integer number of bits
  * @__NO_SIDE_EFFECTS__
  */
+
+
 function padding(bits, chr = '=') {
   anumber(bits);
   astr('padding', chr);
   return {
     encode(data) {
       astrArr('padding.encode', data);
+
       while (data.length * bits % 8) data.push(chr);
+
       return data;
     },
+
     decode(input) {
       astrArr('padding.decode', input);
       let end = input.length;
       if (end * bits % 8) throw new Error('padding: invalid, string should have whole number of bytes');
+
       for (; end > 0 && input[end - 1] === chr; end--) {
         const last = end - 1;
         const byte = last * bits;
         if (byte % 8 === 0) throw new Error('padding: invalid, string has too much padding');
       }
+
       return input.slice(0, end);
     }
+
   };
 }
 /**
  * @__NO_SIDE_EFFECTS__
  */
+
+
 function normalize(fn) {
   afn(fn);
   return {
@@ -66001,6 +66155,8 @@ function normalize(fn) {
 /**
  * Slow: O(n^2) time complexity
  */
+
+
 function convertRadix(data, from, to) {
   // base 1 is impossible
   if (from < 2) throw new Error(`convertRadix: invalid from=${from}, base cannot be less than 2`);
@@ -66015,16 +66171,20 @@ function convertRadix(data, from, to) {
     return d;
   });
   const dlen = digits.length;
+
   while (true) {
     let carry = 0;
     let done = true;
+
     for (let i = pos; i < dlen; i++) {
       const digit = digits[i];
       const fromCarry = from * carry;
       const digitBase = fromCarry + digit;
+
       if (!Number.isSafeInteger(digitBase) || fromCarry / from !== carry || digitBase - digit !== fromCarry) {
         throw new Error('convertRadix: carry overflow');
       }
+
       const div = digitBase / to;
       carry = digitBase % to;
       const rounded = Math.floor(div);
@@ -66032,45 +66192,64 @@ function convertRadix(data, from, to) {
       if (!Number.isSafeInteger(rounded) || rounded * to + carry !== digitBase) throw new Error('convertRadix: carry overflow');
       if (!done) continue;else if (!rounded) pos = i;else done = false;
     }
+
     res.push(carry);
     if (done) break;
   }
+
   for (let i = 0; i < data.length - 1 && data[i] === 0; i++) res.push(0);
+
   return res.reverse();
 }
+
 const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
-const radix2carry = /* @__NO_SIDE_EFFECTS__ */(from, to) => from + (to - gcd(from, to));
+
+const radix2carry =
+/* @__NO_SIDE_EFFECTS__ */
+(from, to) => from + (to - gcd(from, to));
+
 const powers = /* @__PURE__ */(() => {
   let res = [];
+
   for (let i = 0; i < 40; i++) res.push(2 ** i);
+
   return res;
 })();
 /**
  * Implemented with numbers, because BigInt is 5x slower
  */
+
+
 function convertRadix2(data, from, to, padding) {
   aArr(data);
   if (from <= 0 || from > 32) throw new Error(`convertRadix2: wrong from=${from}`);
   if (to <= 0 || to > 32) throw new Error(`convertRadix2: wrong to=${to}`);
+
   if (radix2carry(from, to) > 32) {
     throw new Error(`convertRadix2: carry overflow from=${from} to=${to} carryBits=${radix2carry(from, to)}`);
   }
+
   let carry = 0;
   let pos = 0; // bitwise position in current element
+
   const max = powers[from];
   const mask = powers[to] - 1;
   const res = [];
+
   for (const n of data) {
     anumber(n);
     if (n >= max) throw new Error(`convertRadix2: invalid data word=${n} from=${from}`);
     carry = carry << from | n;
     if (pos + from > 32) throw new Error(`convertRadix2: carry overflow pos=${pos} from=${from}`);
     pos += from;
+
     for (; pos >= to; pos -= to) res.push((carry >> pos - to & mask) >>> 0);
+
     const pow = powers[pos];
     if (pow === undefined) throw new Error('invalid carry');
     carry &= pow - 1; // clean carry, otherwise it will cause overflow
   }
+
   carry = carry << to - pos & mask;
   if (!padding && pos >= from) throw new Error('Excess padding');
   if (!padding && carry > 0) throw new Error(`Non-zero padding: ${carry}`);
@@ -66080,9 +66259,13 @@ function convertRadix2(data, from, to, padding) {
 /**
  * @__NO_SIDE_EFFECTS__
  */
+
+
 function radix(num) {
   anumber(num);
+
   const _256 = 2 ** 8;
+
   return {
     encode: bytes => {
       if (!isBytes(bytes)) throw new Error('radix.encode input should be Uint8Array');
@@ -66099,6 +66282,8 @@ function radix(num) {
  * there is a linear algorithm. For now we have implementation for power-of-two bases only.
  * @__NO_SIDE_EFFECTS__
  */
+
+
 function radix2(bits, revPadding = false) {
   anumber(bits);
   if (bits <= 0 || bits > 32) throw new Error('radix2: bits should be in (0..32]');
@@ -66114,6 +66299,7 @@ function radix2(bits, revPadding = false) {
     }
   };
 }
+
 function unsafeWrapper(fn) {
   afn(fn);
   return function (...args) {
@@ -66122,6 +66308,7 @@ function unsafeWrapper(fn) {
     } catch (e) {}
   };
 }
+
 function checksum(len, fn) {
   anumber(len);
   afn(fn);
@@ -66134,17 +66321,22 @@ function checksum(len, fn) {
       res.set(sum, data.length);
       return res;
     },
+
     decode(data) {
       if (!isBytes(data)) throw new Error('checksum.decode: input should be Uint8Array');
       const payload = data.slice(0, -len);
       const oldChecksum = data.slice(-len);
       const newChecksum = fn(payload).slice(0, len);
+
       for (let i = 0; i < len; i++) if (newChecksum[i] !== oldChecksum[i]) throw new Error('Invalid checksum');
+
       return payload;
     }
+
   };
-}
-// prettier-ignore
+} // prettier-ignore
+
+
 const utils = {
   alphabet,
   chain,
@@ -66155,9 +66347,9 @@ const utils = {
   radix2,
   join,
   padding
-};
-// RFC 4648 aka RFC 3548
+}; // RFC 4648 aka RFC 3548
 // ---------------------
+
 /**
  * base16 encoding from RFC 4648.
  * @example
@@ -66166,6 +66358,7 @@ const utils = {
  * // => '12AB'
  * ```
  */
+
 exports.utils = utils;
 const base16 = chain(radix2(4), alphabet('0123456789ABCDEF'), join(''));
 /**
@@ -66180,6 +66373,7 @@ const base16 = chain(radix2(4), alphabet('0123456789ABCDEF'), join(''));
  * // => Uint8Array.from([0x12, 0xab])
  * ```
  */
+
 exports.base16 = base16;
 const base32 = chain(radix2(5), alphabet('ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'), padding(5), join(''));
 /**
@@ -66194,6 +66388,7 @@ const base32 = chain(radix2(5), alphabet('ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'), pa
  * // => Uint8Array.from([0x12, 0xab])
  * ```
  */
+
 exports.base32 = base32;
 const base32nopad = chain(radix2(5), alphabet('ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'), join(''));
 /**
@@ -66207,6 +66402,7 @@ const base32nopad = chain(radix2(5), alphabet('ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'
  * // => Uint8Array.from([0x12, 0xab])
  * ```
  */
+
 exports.base32nopad = base32nopad;
 const base32hex = chain(radix2(5), alphabet('0123456789ABCDEFGHIJKLMNOPQRSTUV'), padding(5), join(''));
 /**
@@ -66220,6 +66416,7 @@ const base32hex = chain(radix2(5), alphabet('0123456789ABCDEFGHIJKLMNOPQRSTUV'),
  * // => Uint8Array.from([0x12, 0xab])
  * ```
  */
+
 exports.base32hex = base32hex;
 const base32hexnopad = chain(radix2(5), alphabet('0123456789ABCDEFGHIJKLMNOPQRSTUV'), join(''));
 /**
@@ -66233,12 +66430,15 @@ const base32hexnopad = chain(radix2(5), alphabet('0123456789ABCDEFGHIJKLMNOPQRST
  * // => Uint8Array.from([0x12, 0xab])
  * ```
  */
+
 exports.base32hexnopad = base32hexnopad;
-const base32crockford = chain(radix2(5), alphabet('0123456789ABCDEFGHJKMNPQRSTVWXYZ'), join(''), normalize(s => s.toUpperCase().replace(/O/g, '0').replace(/[IL]/g, '1')));
-// Built-in base64 conversion https://caniuse.com/mdn-javascript_builtins_uint8array_frombase64
+const base32crockford = chain(radix2(5), alphabet('0123456789ABCDEFGHJKMNPQRSTVWXYZ'), join(''), normalize(s => s.toUpperCase().replace(/O/g, '0').replace(/[IL]/g, '1'))); // Built-in base64 conversion https://caniuse.com/mdn-javascript_builtins_uint8array_frombase64
 // prettier-ignore
+
 exports.base32crockford = base32crockford;
+
 const hasBase64Builtin = /* @__PURE__ */(() => typeof Uint8Array.from([]).toBase64 === 'function' && typeof Uint8Array.fromBase64 === 'function')();
+
 const decodeBase64Builtin = (s, isUrl) => {
   astr('base64', s);
   const re = isUrl ? /^[A-Za-z0-9=_-]+$/ : /^[A-Za-z0-9=+/]+$/;
@@ -66263,14 +66463,18 @@ const decodeBase64Builtin = (s, isUrl) => {
  * ```
  */
 // prettier-ignore
+
+
 const base64 = hasBase64Builtin ? {
   encode(b) {
     abytes(b);
     return b.toBase64();
   },
+
   decode(s) {
     return decodeBase64Builtin(s, false);
   }
+
 } : chain(radix2(6), alphabet('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'), padding(6), join(''));
 /**
  * base64 from RFC 4648. No padding.
@@ -66283,6 +66487,7 @@ const base64 = hasBase64Builtin ? {
  * // => Uint8Array.from([0x12, 0xab])
  * ```
  */
+
 exports.base64 = base64;
 const base64nopad = chain(radix2(6), alphabet('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'), join(''));
 /**
@@ -66298,6 +66503,7 @@ const base64nopad = chain(radix2(6), alphabet('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefg
  * ```
  */
 // prettier-ignore
+
 exports.base64nopad = base64nopad;
 const base64url = hasBase64Builtin ? {
   encode(b) {
@@ -66306,9 +66512,11 @@ const base64url = hasBase64Builtin ? {
       alphabet: 'base64url'
     });
   },
+
   decode(s) {
     return decodeBase64Builtin(s, true);
   }
+
 } : chain(radix2(6), alphabet('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_'), padding(6), join(''));
 /**
  * base64 from RFC 4648, using URL-safe alphabet. No padding.
@@ -66321,12 +66529,16 @@ const base64url = hasBase64Builtin ? {
  * // => Uint8Array.from([0x12, 0xab])
  * ```
  */
+
 exports.base64url = base64url;
-const base64urlnopad = chain(radix2(6), alphabet('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_'), join(''));
-// base58 code
+const base64urlnopad = chain(radix2(6), alphabet('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_'), join('')); // base58 code
 // -----------
+
 exports.base64urlnopad = base64urlnopad;
-const genBase58 = /* @__NO_SIDE_EFFECTS__ */abc => chain(radix(58), alphabet(abc), join(''));
+
+const genBase58 =
+/* @__NO_SIDE_EFFECTS__ */
+abc => chain(radix(58), alphabet(abc), join(''));
 /**
  * base58: base64 without ambigous characters +, /, 0, O, I, l.
  * Quadratic (O(n^2)) - so, can't be used on large inputs.
@@ -66336,18 +66548,22 @@ const genBase58 = /* @__NO_SIDE_EFFECTS__ */abc => chain(radix(58), alphabet(abc
  * // => '3UhJW'
  * ```
  */
+
+
 const base58 = genBase58('123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz');
 /**
  * base58: flickr version. Check out `base58`.
  */
+
 exports.base58 = base58;
 const base58flickr = genBase58('123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ');
 /**
  * base58: XRP version. Check out `base58`.
  */
+
 exports.base58flickr = base58flickr;
-const base58xrp = genBase58('rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz');
-// Data len (index) -> encoded block len
+const base58xrp = genBase58('rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz'); // Data len (index) -> encoded block len
+
 exports.base58xrp = base58xrp;
 const XMR_BLOCK_LEN = [0, 2, 3, 5, 6, 7, 9, 10, 11];
 /**
@@ -66355,76 +66571,104 @@ const XMR_BLOCK_LEN = [0, 2, 3, 5, 6, 7, 9, 10, 11];
  * Done in 8-byte blocks (which equals 11 chars in decoding). Last (non-full) block padded with '1' to size in XMR_BLOCK_LEN.
  * Block encoding significantly reduces quadratic complexity of base58.
  */
+
 const base58xmr = {
   encode(data) {
     let res = '';
+
     for (let i = 0; i < data.length; i += 8) {
       const block = data.subarray(i, i + 8);
       res += base58.encode(block).padStart(XMR_BLOCK_LEN[block.length], '1');
     }
+
     return res;
   },
+
   decode(str) {
     let res = [];
+
     for (let i = 0; i < str.length; i += 11) {
       const slice = str.slice(i, i + 11);
       const blockLen = XMR_BLOCK_LEN.indexOf(slice.length);
       const block = base58.decode(slice);
+
       for (let j = 0; j < block.length - blockLen; j++) {
         if (block[j] !== 0) throw new Error('base58xmr: wrong padding');
       }
+
       res = res.concat(Array.from(block.slice(block.length - blockLen)));
     }
+
     return Uint8Array.from(res);
   }
+
 };
 /**
  * Method, which creates base58check encoder.
  * Requires function, calculating sha256.
  */
+
 exports.base58xmr = base58xmr;
+
 const createBase58check = sha256 => chain(checksum(4, data => sha256(sha256(data))), base58);
 /**
  * Use `createBase58check` instead.
  * @deprecated
  */
+
+
 exports.createBase58check = createBase58check;
 const base58check = createBase58check;
 exports.base58check = base58check;
 const BECH_ALPHABET = chain(alphabet('qpzry9x8gf2tvdw0s3jn54khce6mua7l'), join(''));
 const POLYMOD_GENERATORS = [0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3];
+
 function bech32Polymod(pre) {
   const b = pre >> 25;
   let chk = (pre & 0x1ffffff) << 5;
+
   for (let i = 0; i < POLYMOD_GENERATORS.length; i++) {
     if ((b >> i & 1) === 1) chk ^= POLYMOD_GENERATORS[i];
   }
+
   return chk;
 }
+
 function bechChecksum(prefix, words, encodingConst = 1) {
   const len = prefix.length;
   let chk = 1;
+
   for (let i = 0; i < len; i++) {
     const c = prefix.charCodeAt(i);
     if (c < 33 || c > 126) throw new Error(`Invalid prefix (${prefix})`);
     chk = bech32Polymod(chk) ^ c >> 5;
   }
+
   chk = bech32Polymod(chk);
+
   for (let i = 0; i < len; i++) chk = bech32Polymod(chk) ^ prefix.charCodeAt(i) & 0x1f;
+
   for (let v of words) chk = bech32Polymod(chk) ^ v;
+
   for (let i = 0; i < 6; i++) chk = bech32Polymod(chk);
+
   chk ^= encodingConst;
   return BECH_ALPHABET.encode(convertRadix2([chk % powers[30]], 30, 5, false));
 }
 /**
  * @__NO_SIDE_EFFECTS__
  */
+
+
 function genBech32(encoding) {
   const ENCODING_CONST = encoding === 'bech32' ? 1 : 0x2bc830a3;
+
   const _words = radix2(5);
+
   const fromWords = _words.decode;
   const toWords = _words.encode;
   const fromWordsUnsafe = unsafeWrapper(fromWords);
+
   function encode(prefix, words, limit = 90) {
     astr('bech32.encode prefix', prefix);
     if (isBytes(words)) words = Array.from(words);
@@ -66437,11 +66681,12 @@ function genBech32(encoding) {
     const sum = bechChecksum(lowered, words, ENCODING_CONST);
     return `${lowered}1${BECH_ALPHABET.encode(words)}${sum}`;
   }
+
   function decode(str, limit = 90) {
     astr('bech32.decode input', str);
     const slen = str.length;
-    if (slen < 8 || limit !== false && slen > limit) throw new TypeError(`invalid string length: ${slen} (${str}). Expected (8..${limit})`);
-    // don't allow mixed case
+    if (slen < 8 || limit !== false && slen > limit) throw new TypeError(`invalid string length: ${slen} (${str}). Expected (8..${limit})`); // don't allow mixed case
+
     const lowered = str.toLowerCase();
     if (str !== lowered && str !== str.toUpperCase()) throw new Error(`String must be lowercase or uppercase`);
     const sepIndex = lowered.lastIndexOf('1');
@@ -66457,7 +66702,9 @@ function genBech32(encoding) {
       words
     };
   }
+
   const decodeUnsafe = unsafeWrapper(decode);
+
   function decodeToBytes(str) {
     const {
       prefix,
@@ -66469,9 +66716,11 @@ function genBech32(encoding) {
       bytes: fromWords(words)
     };
   }
+
   function encodeFromBytes(prefix, bytes) {
     return encode(prefix, toWords(bytes));
   }
+
   return {
     encode,
     decode,
@@ -66488,6 +66737,8 @@ function genBech32(encoding) {
  * For high-level, check out scure-btc-signer:
  * https://github.com/paulmillr/scure-btc-signer.
  */
+
+
 const bech32 = genBech32('bech32');
 /**
  * bech32m from BIP 350. Operates on words.
@@ -66495,6 +66746,7 @@ const bech32 = genBech32('bech32');
  * For high-level, check out scure-btc-signer:
  * https://github.com/paulmillr/scure-btc-signer.
  */
+
 exports.bech32 = bech32;
 const bech32m = genBech32('bech32m');
 /**
@@ -66505,25 +66757,30 @@ const bech32m = genBech32('bech32m');
  * const str = utf8.encode(b); // "hey"
  * ```
  */
+
 exports.bech32m = bech32m;
 const utf8 = {
   encode: data => new TextDecoder().decode(data),
   decode: str => new TextEncoder().encode(str)
-};
-// Built-in hex conversion https://caniuse.com/mdn-javascript_builtins_uint8array_fromhex
+}; // Built-in hex conversion https://caniuse.com/mdn-javascript_builtins_uint8array_fromhex
 // prettier-ignore
+
 exports.utf8 = utf8;
-const hasHexBuiltin = /* @__PURE__ */(() => typeof Uint8Array.from([]).toHex === 'function' && typeof Uint8Array.fromHex === 'function')();
-// prettier-ignore
+
+const hasHexBuiltin = /* @__PURE__ */(() => typeof Uint8Array.from([]).toHex === 'function' && typeof Uint8Array.fromHex === 'function')(); // prettier-ignore
+
+
 const hexBuiltin = {
   encode(data) {
     abytes(data);
     return data.toHex();
   },
+
   decode(s) {
     astr('hex', s);
     return Uint8Array.fromHex(s);
   }
+
 };
 /**
  * hex string decoder. Uses built-in function, when available.
@@ -66533,11 +66790,12 @@ const hexBuiltin = {
  * const str = hex.encode(b); // "0102ff"
  * ```
  */
+
 const hex = hasHexBuiltin ? hexBuiltin : chain(radix2(4), alphabet('0123456789abcdef'), join(''), normalize(s => {
   if (typeof s !== 'string' || s.length % 2 !== 0) throw new TypeError(`hex.decode: expected string, got ${typeof s} with length ${s.length}`);
   return s.toLowerCase();
-}));
-// prettier-ignore
+})); // prettier-ignore
+
 exports.hex = hex;
 const CODERS = {
   utf8,
@@ -66551,22 +66809,30 @@ const CODERS = {
 };
 const coderTypeError = 'Invalid encoding type. Available types: utf8, hex, base16, base32, base64, base64url, base58, base58xmr';
 /** @deprecated */
+
 const bytesToString = (type, bytes) => {
   if (typeof type !== 'string' || !CODERS.hasOwnProperty(type)) throw new TypeError(coderTypeError);
   if (!isBytes(bytes)) throw new TypeError('bytesToString() expects Uint8Array');
   return CODERS[type].encode(bytes);
 };
 /** @deprecated */
+
+
 exports.bytesToString = bytesToString;
 const str = bytesToString; // as in python, but for bytes only
+
 /** @deprecated */
+
 exports.str = str;
+
 const stringToBytes = (type, str) => {
   if (!CODERS.hasOwnProperty(type)) throw new TypeError(coderTypeError);
   if (typeof str !== 'string') throw new TypeError('stringToBytes() expects string');
   return CODERS[type].decode(str);
 };
 /** @deprecated */
+
+
 exports.stringToBytes = stringToBytes;
 const bytes = stringToBytes;
 exports.bytes = bytes;
@@ -66576,17 +66842,22 @@ exports.bytes = bytes;
 'use strict';
 
 var possibleNames = require('possible-typed-array-names');
-var g = typeof globalThis === 'undefined' ? global : globalThis;
 
+var g = typeof globalThis === 'undefined' ? global : globalThis;
 /** @type {import('.')} */
+
 module.exports = function availableTypedArrays() {
-  var /** @type {ReturnType<typeof availableTypedArrays>} */out = [];
+  var
+  /** @type {ReturnType<typeof availableTypedArrays>} */
+  out = [];
+
   for (var i = 0; i < possibleNames.length; i++) {
     if (typeof g[possibleNames[i]] === 'function') {
       // @ts-expect-error
       out[out.length] = possibleNames[i];
     }
   }
+
   return out;
 };
 
@@ -66723,20 +66994,34 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.BIP32Factory = BIP32Factory;
+
 var crypto = _interopRequireWildcard(require("./crypto.js"));
+
 var _testecc = require("./testecc.js");
+
 var _base = require("@scure/base");
+
 var _sha = require("@noble/hashes/sha256");
+
 var v = _interopRequireWildcard(require("valibot"));
+
 var _types = require("./types.js");
+
 var wif = _interopRequireWildcard(require("wif"));
+
 var tools = _interopRequireWildcard(require("uint8array-tools"));
-function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function (e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, default: e }; if (null === e || "object" != typeof e && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (const t in e) "default" !== t && {}.hasOwnProperty.call(e, t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, t)) && (i.get || i.set) ? o(f, t, i) : f[t] = e[t]); return f; })(e, t); }
+
+function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
+
+function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
 const _bs58check = (0, _base.base58check)(_sha.sha256);
+
 const bs58check = {
   encode: data => _bs58check.encode(data),
   decode: str => _bs58check.decode(str)
 };
+
 function BIP32Factory(ecc) {
   (0, _testecc.testEcc)(ecc);
   const BITCOIN = {
@@ -66751,62 +67036,76 @@ function BIP32Factory(ecc) {
     wif: 0x80
   };
   const HIGHEST_BIT = 0x80000000;
+
   function toXOnly(pubKey) {
     return pubKey.length === 32 ? pubKey : pubKey.slice(1, 33);
   }
+
   class Bip32Signer {
     __D;
     __Q;
     lowR = false;
+
     constructor(__D, __Q) {
       this.__D = __D;
       this.__Q = __Q;
     }
+
     get publicKey() {
       if (this.__Q === undefined) this.__Q = ecc.pointFromScalar(this.__D, true);
       return this.__Q;
     }
+
     get privateKey() {
       return this.__D;
     }
+
     sign(hash, lowR) {
       if (!this.privateKey) throw new Error('Missing private key');
       if (lowR === undefined) lowR = this.lowR;
+
       if (lowR === false) {
         return ecc.sign(hash, this.privateKey);
       } else {
         let sig = ecc.sign(hash, this.privateKey);
         const extraData = new Uint8Array(32);
-        let counter = 0;
-        // if first try is lowR, skip the loop
+        let counter = 0; // if first try is lowR, skip the loop
         // for second try and on, add extra entropy counting up
+
         while (sig[0] > 0x7f) {
           counter++;
           tools.writeUInt32(extraData, 0, counter, 'LE');
           sig = ecc.sign(hash, this.privateKey, extraData);
         }
+
         return sig;
       }
     }
+
     signSchnorr(hash) {
       if (!this.privateKey) throw new Error('Missing private key');
       if (!ecc.signSchnorr) throw new Error('signSchnorr not supported by ecc library');
       return ecc.signSchnorr(hash, this.privateKey);
     }
+
     verify(hash, signature) {
       return ecc.verify(hash, this.publicKey, signature);
     }
+
     verifySchnorr(hash, signature) {
       if (!ecc.verifySchnorr) throw new Error('verifySchnorr not supported by ecc library');
       return ecc.verifySchnorr(hash, this.publicKey.subarray(1, 33), signature);
     }
+
   }
+
   class BIP32 extends Bip32Signer {
     chainCode;
     network;
     __DEPTH;
     __INDEX;
     __PARENT_FINGERPRINT;
+
     constructor(__D, __Q, chainCode, network, __DEPTH = 0, __INDEX = 0, __PARENT_FINGERPRINT = 0x00000000) {
       super(__D, __Q);
       this.chainCode = chainCode;
@@ -66816,59 +67115,69 @@ function BIP32Factory(ecc) {
       this.__PARENT_FINGERPRINT = __PARENT_FINGERPRINT;
       v.parse(_types.NetworkSchema, network);
     }
+
     get depth() {
       return this.__DEPTH;
     }
+
     get index() {
       return this.__INDEX;
     }
+
     get parentFingerprint() {
       return this.__PARENT_FINGERPRINT;
     }
+
     get identifier() {
       return crypto.hash160(this.publicKey);
     }
+
     get fingerprint() {
       return this.identifier.slice(0, 4);
     }
+
     get compressed() {
       return true;
-    }
-    // Private === not neutered
+    } // Private === not neutered
     // Public === neutered
+
+
     isNeutered() {
       return this.__D === undefined;
     }
+
     neutered() {
       return fromPublicKeyLocal(this.publicKey, this.chainCode, this.network, this.depth, this.index, this.parentFingerprint);
     }
+
     toBase58() {
       const network = this.network;
       const version = !this.isNeutered() ? network.bip32.private : network.bip32.public;
-      const buffer = new Uint8Array(78);
-      // 4 bytes: version bytes
-      tools.writeUInt32(buffer, 0, version, 'BE');
-      // 1 byte: depth: 0x00 for master nodes, 0x01 for level-1 descendants, ....
-      tools.writeUInt8(buffer, 4, this.depth);
-      // 4 bytes: the fingerprint of the parent's key (0x00000000 if master key)
-      tools.writeUInt32(buffer, 5, this.parentFingerprint, 'BE');
-      // 4 bytes: child number. This is the number i in xi = xpar/i, with xi the key being serialized.
+      const buffer = new Uint8Array(78); // 4 bytes: version bytes
+
+      tools.writeUInt32(buffer, 0, version, 'BE'); // 1 byte: depth: 0x00 for master nodes, 0x01 for level-1 descendants, ....
+
+      tools.writeUInt8(buffer, 4, this.depth); // 4 bytes: the fingerprint of the parent's key (0x00000000 if master key)
+
+      tools.writeUInt32(buffer, 5, this.parentFingerprint, 'BE'); // 4 bytes: child number. This is the number i in xi = xpar/i, with xi the key being serialized.
       // This is encoded in big endian. (0x00000000 if master key)
-      tools.writeUInt32(buffer, 9, this.index, 'BE');
-      // 32 bytes: the chain code
-      buffer.set(this.chainCode, 13);
-      // 33 bytes: the public key or private key data
+
+      tools.writeUInt32(buffer, 9, this.index, 'BE'); // 32 bytes: the chain code
+
+      buffer.set(this.chainCode, 13); // 33 bytes: the public key or private key data
+
       if (!this.isNeutered()) {
         // 0x00 + k for private keys
         tools.writeUInt8(buffer, 45, 0);
-        buffer.set(this.privateKey, 46);
-        // 33 bytes: the public key
+        buffer.set(this.privateKey, 46); // 33 bytes: the public key
       } else {
         // X9.62 encoding for public keys
         buffer.set(this.publicKey, 45);
       }
+
       return bs58check.encode(buffer);
     }
+
     toWIF() {
       if (!this.privateKey) throw new TypeError('Missing private key');
       return wif.encode({
@@ -66876,65 +67185,71 @@ function BIP32Factory(ecc) {
         privateKey: this.privateKey,
         compressed: true
       });
-    }
-    // https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki#child-key-derivation-ckd-functions
+    } // https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki#child-key-derivation-ckd-functions
+
+
     derive(index) {
       v.parse(_types.Uint32Schema, index);
       const isHardened = index >= HIGHEST_BIT;
-      const data = new Uint8Array(37);
-      // Hardened child
+      const data = new Uint8Array(37); // Hardened child
+
       if (isHardened) {
-        if (this.isNeutered()) throw new TypeError('Missing private key for hardened child key');
-        // data = 0x00 || ser256(kpar) || ser32(index)
+        if (this.isNeutered()) throw new TypeError('Missing private key for hardened child key'); // data = 0x00 || ser256(kpar) || ser32(index)
+
         data[0] = 0x00;
         data.set(this.privateKey, 1);
-        tools.writeUInt32(data, 33, index, 'BE');
-        // Normal child
+        tools.writeUInt32(data, 33, index, 'BE'); // Normal child
       } else {
         // data = serP(point(kpar)) || ser32(index)
         //      = serP(Kpar) || ser32(index)
         data.set(this.publicKey, 0);
         tools.writeUInt32(data, 33, index, 'BE');
       }
+
       const I = crypto.hmacSHA512(this.chainCode, data);
       const IL = I.slice(0, 32);
-      const IR = I.slice(32);
-      // if parse256(IL) >= n, proceed with the next value for i
-      if (!ecc.isPrivate(IL)) return this.derive(index + 1);
-      // Private parent key -> private child key
+      const IR = I.slice(32); // if parse256(IL) >= n, proceed with the next value for i
+
+      if (!ecc.isPrivate(IL)) return this.derive(index + 1); // Private parent key -> private child key
+
       let hd;
+
       if (!this.isNeutered()) {
         // ki = parse256(IL) + kpar (mod n)
-        const ki = ecc.privateAdd(this.privateKey, IL);
-        // In case ki == 0, proceed with the next value for i
+        const ki = ecc.privateAdd(this.privateKey, IL); // In case ki == 0, proceed with the next value for i
+
         if (ki == null) return this.derive(index + 1);
-        hd = fromPrivateKeyLocal(ki, IR, this.network, this.depth + 1, index, tools.readUInt32(this.fingerprint, 0, 'BE'));
-        // Public parent key -> public child key
+        hd = fromPrivateKeyLocal(ki, IR, this.network, this.depth + 1, index, tools.readUInt32(this.fingerprint, 0, 'BE')); // Public parent key -> public child key
       } else {
         // Ki = point(parse256(IL)) + Kpar
         //    = G*IL + Kpar
-        const Ki = ecc.pointAddScalar(this.publicKey, IL, true);
-        // In case Ki is the point at infinity, proceed with the next value for i
+        const Ki = ecc.pointAddScalar(this.publicKey, IL, true); // In case Ki is the point at infinity, proceed with the next value for i
+
         if (Ki === null) return this.derive(index + 1);
         hd = fromPublicKeyLocal(Ki, IR, this.network, this.depth + 1, index, tools.readUInt32(this.fingerprint, 0, 'BE'));
       }
+
       return hd;
     }
+
     deriveHardened(index) {
-      if (typeof v.parse(_types.Uint31Schema, index) === 'number')
-        // Only derives hardened private keys by default
+      if (typeof v.parse(_types.Uint31Schema, index) === 'number') // Only derives hardened private keys by default
         return this.derive(index + HIGHEST_BIT);
       throw new TypeError('Expected UInt31, got ' + index);
     }
+
     derivePath(path) {
       v.parse(_types.Bip32PathSchema, path);
       let splitPath = path.split('/');
+
       if (splitPath[0] === 'm') {
         if (this.parentFingerprint) throw new TypeError('Expected master, got child');
         splitPath = splitPath.slice(1);
       }
+
       return splitPath.reduce((prevHd, indexStr) => {
         let index;
+
         if (indexStr.slice(-1) === `'`) {
           index = parseInt(indexStr.slice(0, -1), 10);
           return prevHd.deriveHardened(index);
@@ -66944,10 +67259,12 @@ function BIP32Factory(ecc) {
         }
       }, this);
     }
+
     tweak(t) {
       if (this.privateKey) return this.tweakFromPrivateKey(t);
       return this.tweakFromPublicKey(t);
     }
+
     tweakFromPublicKey(t) {
       const xOnlyPubKey = toXOnly(this.publicKey);
       if (!ecc.xOnlyPointAddTweak) throw new Error('xOnlyPointAddTweak not supported by ecc library');
@@ -66957,52 +67274,61 @@ function BIP32Factory(ecc) {
       const tweakedPublicKeyCompresed = tools.concat([parityByte, tweakedPublicKey.xOnlyPubkey]);
       return new Bip32Signer(undefined, tweakedPublicKeyCompresed);
     }
+
     tweakFromPrivateKey(t) {
       const hasOddY = this.publicKey[0] === 3 || this.publicKey[0] === 4 && (this.publicKey[64] & 1) === 1;
+
       const privateKey = (() => {
         if (!hasOddY) return this.privateKey;else if (!ecc.privateNegate) throw new Error('privateNegate not supported by ecc library');else return ecc.privateNegate(this.privateKey);
       })();
+
       const tweakedPrivateKey = ecc.privateAdd(privateKey, t);
       if (!tweakedPrivateKey) throw new Error('Invalid tweaked private key!');
       return new Bip32Signer(tweakedPrivateKey, undefined);
     }
+
   }
+
   function fromBase58(inString, network) {
     const buffer = bs58check.decode(inString);
     if (buffer.length !== 78) throw new TypeError('Invalid buffer length');
-    network = network || BITCOIN;
-    // 4 bytes: version bytes
+    network = network || BITCOIN; // 4 bytes: version bytes
+
     const version = tools.readUInt32(buffer, 0, 'BE');
-    if (version !== network.bip32.private && version !== network.bip32.public) throw new TypeError('Invalid network version');
-    // 1 byte: depth: 0x00 for master nodes, 0x01 for level-1 descendants, ...
-    const depth = buffer[4];
-    // 4 bytes: the fingerprint of the parent's key (0x00000000 if master key)
+    if (version !== network.bip32.private && version !== network.bip32.public) throw new TypeError('Invalid network version'); // 1 byte: depth: 0x00 for master nodes, 0x01 for level-1 descendants, ...
+
+    const depth = buffer[4]; // 4 bytes: the fingerprint of the parent's key (0x00000000 if master key)
+
     const parentFingerprint = tools.readUInt32(buffer, 5, 'BE');
+
     if (depth === 0) {
       if (parentFingerprint !== 0x00000000) throw new TypeError('Invalid parent fingerprint');
-    }
-    // 4 bytes: child number. This is the number i in xi = xpar/i, with xi the key being serialized.
+    } // 4 bytes: child number. This is the number i in xi = xpar/i, with xi the key being serialized.
     // This is encoded in MSB order. (0x00000000 if master key)
+
+
     const index = tools.readUInt32(buffer, 9, 'BE');
-    if (depth === 0 && index !== 0) throw new TypeError('Invalid index');
-    // 32 bytes: the chain code
+    if (depth === 0 && index !== 0) throw new TypeError('Invalid index'); // 32 bytes: the chain code
+
     const chainCode = buffer.slice(13, 45);
-    let hd;
-    // 33 bytes: private key data (0x00 + k)
+    let hd; // 33 bytes: private key data (0x00 + k)
+
     if (version === network.bip32.private) {
       if (buffer[45] !== 0x00) throw new TypeError('Invalid private key');
       const k = buffer.slice(46, 78);
-      hd = fromPrivateKeyLocal(k, chainCode, network, depth, index, parentFingerprint);
-      // 33 bytes: public key data (0x02 + X or 0x03 + X)
+      hd = fromPrivateKeyLocal(k, chainCode, network, depth, index, parentFingerprint); // 33 bytes: public key data (0x02 + X or 0x03 + X)
     } else {
       const X = buffer.slice(45, 78);
       hd = fromPublicKeyLocal(X, chainCode, network, depth, index, parentFingerprint);
     }
+
     return hd;
   }
+
   function fromPrivateKey(privateKey, chainCode, network) {
     return fromPrivateKeyLocal(privateKey, chainCode, network);
   }
+
   function fromPrivateKeyLocal(privateKey, chainCode, network, depth, index, parentFingerprint) {
     v.parse(_types.Buffer256Bit, privateKey);
     v.parse(_types.Buffer256Bit, chainCode);
@@ -67010,17 +67336,20 @@ function BIP32Factory(ecc) {
     if (!ecc.isPrivate(privateKey)) throw new TypeError('Private key not in range [1, n)');
     return new BIP32(privateKey, undefined, chainCode, network, depth, index, parentFingerprint);
   }
+
   function fromPublicKey(publicKey, chainCode, network) {
     return fromPublicKeyLocal(publicKey, chainCode, network);
   }
+
   function fromPublicKeyLocal(publicKey, chainCode, network, depth, index, parentFingerprint) {
     v.parse(_types.Buffer33Bytes, publicKey);
     v.parse(_types.Buffer256Bit, chainCode);
-    network = network || BITCOIN;
-    // verify the X coordinate is a point on the curve
+    network = network || BITCOIN; // verify the X coordinate is a point on the curve
+
     if (!ecc.isPoint(publicKey)) throw new TypeError('Point is not on the curve');
     return new BIP32(undefined, publicKey, chainCode, network, depth, index, parentFingerprint);
   }
+
   function fromSeed(seed, network) {
     v.parse(v.instance(Uint8Array), seed);
     if (seed.length < 16) throw new TypeError('Seed should be at least 128 bits');
@@ -67031,6 +67360,7 @@ function BIP32Factory(ecc) {
     const IR = I.slice(32);
     return fromPrivateKey(IL, IR, network);
   }
+
   return {
     fromSeed,
     fromBase58,
@@ -67047,13 +67377,19 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.hash160 = hash160;
 exports.hmacSHA512 = hmacSHA512;
+
 var _hmac = require("@noble/hashes/hmac");
+
 var _ripemd = require("@noble/hashes/ripemd160");
+
 var _sha = require("@noble/hashes/sha256");
+
 var _sha2 = require("@noble/hashes/sha512");
+
 function hash160(buffer) {
   return (0, _ripemd.ripemd160)((0, _sha.sha256)(buffer));
 }
+
 function hmacSHA512(key, data) {
   return (0, _hmac.hmac)(_sha2.sha512, key, data);
 }
@@ -67064,18 +67400,19 @@ function hmacSHA512(key, data) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-Object.defineProperty(exports, "default", {
-  enumerable: true,
-  get: function () {
-    return _bip.BIP32Factory;
-  }
-});
 Object.defineProperty(exports, "BIP32Factory", {
   enumerable: true,
   get: function () {
     return _bip.BIP32Factory;
   }
 });
+Object.defineProperty(exports, "default", {
+  enumerable: true,
+  get: function () {
+    return _bip.BIP32Factory;
+  }
+});
+
 var _bip = require("./bip32.js");
 
 },{"./bip32.js":244}],247:[function(require,module,exports){
@@ -67085,44 +67422,57 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.testEcc = testEcc;
+
 var tools = _interopRequireWildcard(require("uint8array-tools"));
-function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function (e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, default: e }; if (null === e || "object" != typeof e && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (const t in e) "default" !== t && {}.hasOwnProperty.call(e, t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, t)) && (i.get || i.set) ? o(f, t, i) : f[t] = e[t]); return f; })(e, t); }
+
+function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
+
+function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
 const h = hex => tools.fromHex(hex);
+
 function testEcc(ecc) {
   assert(ecc.isPoint(h('0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798')));
   assert(!ecc.isPoint(h('030000000000000000000000000000000000000000000000000000000000000005')));
-  assert(ecc.isPrivate(h('79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798')));
-  // order - 1
-  assert(ecc.isPrivate(h('fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364140')));
-  // 0
-  assert(!ecc.isPrivate(h('0000000000000000000000000000000000000000000000000000000000000000')));
-  // order
-  assert(!ecc.isPrivate(h('fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141')));
-  // order + 1
+  assert(ecc.isPrivate(h('79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798'))); // order - 1
+
+  assert(ecc.isPrivate(h('fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364140'))); // 0
+
+  assert(!ecc.isPrivate(h('0000000000000000000000000000000000000000000000000000000000000000'))); // order
+
+  assert(!ecc.isPrivate(h('fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141'))); // order + 1
+
   assert(!ecc.isPrivate(h('fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364142')));
   assert(tools.compare(ecc.pointFromScalar(h('b1121e4088a66a28f5b6b0f5844943ecd9f610196d7bb83b25214b60452c09af')), h('02b07ba9dca9523b7ef4bd97703d43d20399eb698e194704791a25ce77a400df99')) === 0);
+
   if (ecc.xOnlyPointAddTweak) {
     assert(ecc.xOnlyPointAddTweak(h('79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798'), h('fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364140')) === null);
     let xOnlyRes = ecc.xOnlyPointAddTweak(h('1617d38ed8d8657da4d4761e8057bc396ea9e4b9d29776d4be096016dbd2509b'), h('a8397a935f0dfceba6ba9618f6451ef4d80637abf4e6af2669fbc9de6a8fd2ac'));
     assert(tools.compare(xOnlyRes.xOnlyPubkey, h('e478f99dab91052ab39a33ea35fd5e6e4933f4d28023cd597c9a1f6760346adf')) === 0 && xOnlyRes.parity === 1);
     xOnlyRes = ecc.xOnlyPointAddTweak(h('2c0b7cf95324a07d05398b240174dc0c2be444d96b159aa6c7f7b1e668680991'), h('823c3cd2142744b075a87eade7e1b8678ba308d566226a0056ca2b7a76f86b47'));
   }
+
   assert(tools.compare(ecc.pointAddScalar(h('0379be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798'), h('0000000000000000000000000000000000000000000000000000000000000003')), h('02c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5')) === 0);
   assert(tools.compare(ecc.privateAdd(h('fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd036413e'), h('0000000000000000000000000000000000000000000000000000000000000002')), h('fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364140')) === 0);
+
   if (ecc.privateNegate) {
     assert(tools.compare(ecc.privateNegate(h('0000000000000000000000000000000000000000000000000000000000000001')), h('fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364140')) === 0);
     assert(tools.compare(ecc.privateNegate(h('fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd036413e')), h('0000000000000000000000000000000000000000000000000000000000000003')) === 0);
     assert(tools.compare(ecc.privateNegate(h('b1121e4088a66a28f5b6b0f5844943ecd9f610196d7bb83b25214b60452c09af')), h('4eede1bf775995d70a494f0a7bb6bc11e0b8cccd41cce8009ab1132c8b0a3792')) === 0);
   }
+
   assert(tools.compare(ecc.sign(h('5e9f0a0d593efdcf78ac923bc3313e4e7d408d574354ee2b3288c0da9fbba6ed'), h('fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364140')), h('54c4a33c6423d689378f160a7ff8b61330444abb58fb470f96ea16d99d4a2fed07082304410efa6b2943111b6a4e0aaa7b7db55a07e9861d1fb3cb1f421044a5')) === 0);
   assert(ecc.verify(h('5e9f0a0d593efdcf78ac923bc3313e4e7d408d574354ee2b3288c0da9fbba6ed'), h('0379be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798'), h('54c4a33c6423d689378f160a7ff8b61330444abb58fb470f96ea16d99d4a2fed07082304410efa6b2943111b6a4e0aaa7b7db55a07e9861d1fb3cb1f421044a5')));
+
   if (ecc.signSchnorr) {
     assert(tools.compare(ecc.signSchnorr(h('7e2d58d8b3bcdf1abadec7829054f90dda9805aab56c77333024b9d0a508b75c'), h('c90fdaa22168c234c4c6628b80dc1cd129024e088a67cc74020bbea63b14e5c9'), h('c87aa53824b4d7ae2eb035a2b5bbbccc080e76cdc6d1692c4b0b62d798e6d906')), h('5831aaeed7b44bb74e5eab94ba9d4294c49bcf2a60728d8b4c200f50dd313c1bab745879a5ad954a72c45a91c3a51d3c7adea98d82f8481e0e1e03674a6f3fb7')) === 0);
   }
+
   if (ecc.verifySchnorr) {
     assert(ecc.verifySchnorr(h('7e2d58d8b3bcdf1abadec7829054f90dda9805aab56c77333024b9d0a508b75c'), h('dd308afec5777e13121fa72b9cc1b7cc0139715309b086c960e18fd969774eb8'), h('5831aaeed7b44bb74e5eab94ba9d4294c49bcf2a60728d8b4c200f50dd313c1bab745879a5ad954a72c45a91c3a51d3c7adea98d82f8481e0e1e03674a6f3fb7')));
   }
 }
+
 function assert(bool) {
   if (!bool) throw new Error('ecc library invalid');
 }
@@ -67133,9 +67483,14 @@ function assert(bool) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Bip32PathSchema = exports.NetworkSchema = exports.Buffer33Bytes = exports.Buffer256Bit = exports.Uint31Schema = exports.Uint32Schema = void 0;
+exports.Uint32Schema = exports.Uint31Schema = exports.NetworkSchema = exports.Buffer33Bytes = exports.Buffer256Bit = exports.Bip32PathSchema = void 0;
+
 var v = _interopRequireWildcard(require("valibot"));
-function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function (e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, default: e }; if (null === e || "object" != typeof e && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (const t in e) "default" !== t && {}.hasOwnProperty.call(e, t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, t)) && (i.get || i.set) ? o(f, t, i) : f[t] = e[t]); return f; })(e, t); }
+
+function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
+
+function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
 const Uint32Schema = v.pipe(v.number(), v.integer(), v.minValue(0), v.maxValue(0xffffffff));
 exports.Uint32Schema = Uint32Schema;
 const Uint31Schema = v.pipe(v.number(), v.integer(), v.minValue(0), v.maxValue(0x7fffffff));
@@ -67232,57 +67587,69 @@ module.exports = bs58checkBase(sha256x2)
 'use strict';
 
 var bind = require('function-bind');
-var $apply = require('./functionApply');
-var $call = require('./functionCall');
-var $reflectApply = require('./reflectApply');
 
+var $apply = require('./functionApply');
+
+var $call = require('./functionCall');
+
+var $reflectApply = require('./reflectApply');
 /** @type {import('./actualApply')} */
+
+
 module.exports = $reflectApply || bind.call($call, $apply);
 
 },{"./functionApply":254,"./functionCall":255,"./reflectApply":257,"function-bind":276}],253:[function(require,module,exports){
 'use strict';
 
 var bind = require('function-bind');
-var $apply = require('./functionApply');
-var actualApply = require('./actualApply');
 
+var $apply = require('./functionApply');
+
+var actualApply = require('./actualApply');
 /** @type {import('./applyBind')} */
+
+
 module.exports = function applyBind() {
   return actualApply(bind, $apply, arguments);
 };
 
 },{"./actualApply":252,"./functionApply":254,"function-bind":276}],254:[function(require,module,exports){
 'use strict';
-
 /** @type {import('./functionApply')} */
+
 module.exports = Function.prototype.apply;
 
 },{}],255:[function(require,module,exports){
 'use strict';
-
 /** @type {import('./functionCall')} */
+
 module.exports = Function.prototype.call;
 
 },{}],256:[function(require,module,exports){
 'use strict';
 
 var bind = require('function-bind');
-var $TypeError = require('es-errors/type');
-var $call = require('./functionCall');
-var $actualApply = require('./actualApply');
 
+var $TypeError = require('es-errors/type');
+
+var $call = require('./functionCall');
+
+var $actualApply = require('./actualApply');
 /** @type {(args: [Function, thisArg?: unknown, ...args: unknown[]]) => Function} TODO FIXME, find a way to use import('.') */
+
+
 module.exports = function callBindBasic(args) {
   if (args.length < 1 || typeof args[0] !== 'function') {
     throw new $TypeError('a function is required');
   }
+
   return $actualApply(bind, $call, args);
 };
 
 },{"./actualApply":252,"./functionCall":255,"es-errors/type":271,"function-bind":276}],257:[function(require,module,exports){
 'use strict';
-
 /** @type {import('./reflectApply')} */
+
 module.exports = typeof Reflect !== 'undefined' && Reflect && Reflect.apply;
 
 },{}],258:[function(require,module,exports){
@@ -67291,19 +67658,26 @@ arguments[4][55][0].apply(exports,arguments)
 'use strict';
 
 var GetIntrinsic = require('get-intrinsic');
+
 var callBindBasic = require('call-bind-apply-helpers');
-
 /** @type {(thisArg: string, searchString: string, position?: number) => number} */
-var $indexOf = callBindBasic([GetIntrinsic('%String.prototype.indexOf%')]);
 
+
+var $indexOf = callBindBasic([GetIntrinsic('%String.prototype.indexOf%')]);
 /** @type {import('.')} */
+
 module.exports = function callBoundIntrinsic(name, allowMissing) {
   /* eslint no-extra-parens: 0 */
+  var intrinsic =
+  /** @type {(this: unknown, ...args: unknown[]) => unknown} */
+  GetIntrinsic(name, !!allowMissing);
 
-  var intrinsic = /** @type {(this: unknown, ...args: unknown[]) => unknown} */GetIntrinsic(name, !!allowMissing);
   if (typeof intrinsic === 'function' && $indexOf(name, '.prototype.') > -1) {
-    return callBindBasic(/** @type {const} */[intrinsic]);
+    return callBindBasic(
+    /** @type {const} */
+    [intrinsic]);
   }
+
   return intrinsic;
 };
 
@@ -67484,37 +67858,48 @@ arguments[4][61][0].apply(exports,arguments)
 'use strict';
 
 var $defineProperty = require('es-define-property');
-var $SyntaxError = require('es-errors/syntax');
-var $TypeError = require('es-errors/type');
-var gopd = require('gopd');
 
+var $SyntaxError = require('es-errors/syntax');
+
+var $TypeError = require('es-errors/type');
+
+var gopd = require('gopd');
 /** @type {import('.')} */
+
+
 module.exports = function defineDataProperty(obj, property, value) {
   if (!obj || typeof obj !== 'object' && typeof obj !== 'function') {
     throw new $TypeError('`obj` must be an object or a function`');
   }
+
   if (typeof property !== 'string' && typeof property !== 'symbol') {
     throw new $TypeError('`property` must be a string or a symbol`');
   }
+
   if (arguments.length > 3 && typeof arguments[3] !== 'boolean' && arguments[3] !== null) {
     throw new $TypeError('`nonEnumerable`, if provided, must be a boolean or null');
   }
+
   if (arguments.length > 4 && typeof arguments[4] !== 'boolean' && arguments[4] !== null) {
     throw new $TypeError('`nonWritable`, if provided, must be a boolean or null');
   }
+
   if (arguments.length > 5 && typeof arguments[5] !== 'boolean' && arguments[5] !== null) {
     throw new $TypeError('`nonConfigurable`, if provided, must be a boolean or null');
   }
+
   if (arguments.length > 6 && typeof arguments[6] !== 'boolean') {
     throw new $TypeError('`loose`, if provided, must be a boolean');
   }
+
   var nonEnumerable = arguments.length > 3 ? arguments[3] : null;
   var nonWritable = arguments.length > 4 ? arguments[4] : null;
   var nonConfigurable = arguments.length > 5 ? arguments[5] : null;
   var loose = arguments.length > 6 ? arguments[6] : false;
-
   /* @type {false | TypedPropertyDescriptor<unknown>} */
+
   var desc = !!gopd && gopd(obj, property);
+
   if ($defineProperty) {
     $defineProperty(obj, property, {
       configurable: nonConfigurable === null && desc ? desc.configurable : !nonConfigurable,
@@ -67534,33 +67919,43 @@ module.exports = function defineDataProperty(obj, property, value) {
 'use strict';
 
 var callBind = require('call-bind-apply-helpers');
+
 var gOPD = require('gopd');
+
 var hasProtoAccessor;
+
 try {
   // eslint-disable-next-line no-extra-parens, no-proto
-  hasProtoAccessor = /** @type {{ __proto__?: typeof Array.prototype }} */[].__proto__ === Array.prototype;
+  hasProtoAccessor =
+  /** @type {{ __proto__?: typeof Array.prototype }} */
+  [].__proto__ === Array.prototype;
 } catch (e) {
   if (!e || typeof e !== 'object' || !('code' in e) || e.code !== 'ERR_PROTO_ACCESS') {
     throw e;
   }
-}
+} // eslint-disable-next-line no-extra-parens
 
-// eslint-disable-next-line no-extra-parens
-var desc = !!hasProtoAccessor && gOPD && gOPD(Object.prototype, /** @type {keyof typeof Object.prototype} */'__proto__');
+
+var desc = !!hasProtoAccessor && gOPD && gOPD(Object.prototype,
+/** @type {keyof typeof Object.prototype} */
+'__proto__');
 var $Object = Object;
 var $getPrototypeOf = $Object.getPrototypeOf;
-
 /** @type {import('./get')} */
-module.exports = desc && typeof desc.get === 'function' ? callBind([desc.get]) : typeof $getPrototypeOf === 'function' ? /** @type {import('./get')} */function getDunder(value) {
+
+module.exports = desc && typeof desc.get === 'function' ? callBind([desc.get]) : typeof $getPrototypeOf === 'function' ?
+/** @type {import('./get')} */
+function getDunder(value) {
   // eslint-disable-next-line eqeqeq
   return $getPrototypeOf(value == null ? value : $Object(value));
 } : false;
 
 },{"call-bind-apply-helpers":256,"gopd":282}],265:[function(require,module,exports){
 'use strict';
-
 /** @type {import('.')} */
+
 var $defineProperty = Object.defineProperty || false;
+
 if ($defineProperty) {
   try {
     $defineProperty({}, 'a', {
@@ -67571,64 +67966,66 @@ if ($defineProperty) {
     $defineProperty = false;
   }
 }
+
 module.exports = $defineProperty;
 
 },{}],266:[function(require,module,exports){
 'use strict';
-
 /** @type {import('./eval')} */
+
 module.exports = EvalError;
 
 },{}],267:[function(require,module,exports){
 'use strict';
-
 /** @type {import('.')} */
+
 module.exports = Error;
 
 },{}],268:[function(require,module,exports){
 'use strict';
-
 /** @type {import('./range')} */
+
 module.exports = RangeError;
 
 },{}],269:[function(require,module,exports){
 'use strict';
-
 /** @type {import('./ref')} */
+
 module.exports = ReferenceError;
 
 },{}],270:[function(require,module,exports){
 'use strict';
-
 /** @type {import('./syntax')} */
+
 module.exports = SyntaxError;
 
 },{}],271:[function(require,module,exports){
 'use strict';
-
 /** @type {import('./type')} */
+
 module.exports = TypeError;
 
 },{}],272:[function(require,module,exports){
 'use strict';
-
 /** @type {import('./uri')} */
+
 module.exports = URIError;
 
 },{}],273:[function(require,module,exports){
 'use strict';
-
 /** @type {import('.')} */
+
 module.exports = Object;
 
 },{}],274:[function(require,module,exports){
 'use strict';
 
 var isCallable = require('is-callable');
+
 var toStr = Object.prototype.toString;
 var hasOwnProperty = Object.prototype.hasOwnProperty;
-
 /** @type {<This, A extends readonly unknown[]>(arr: A, iterator: (this: This | void, value: A[number], index: number, arr: A) => void, receiver: This | undefined) => void} */
+
 var forEachArray = function forEachArray(array, iterator, receiver) {
   for (var i = 0, len = array.length; i < len; i++) {
     if (hasOwnProperty.call(array, i)) {
@@ -67640,8 +68037,9 @@ var forEachArray = function forEachArray(array, iterator, receiver) {
     }
   }
 };
-
 /** @type {<This, S extends string>(string: S, iterator: (this: This | void, value: S[number], index: number, string: S) => void, receiver: This | undefined) => void} */
+
+
 var forEachString = function forEachString(string, iterator, receiver) {
   for (var i = 0, len = string.length; i < len; i++) {
     // no such thing as a sparse string.
@@ -67652,8 +68050,9 @@ var forEachString = function forEachString(string, iterator, receiver) {
     }
   }
 };
-
 /** @type {<This, O>(obj: O, iterator: (this: This | void, value: O[keyof O], index: keyof O, obj: O) => void, receiver: This | undefined) => void} */
+
+
 var forEachObject = function forEachObject(object, iterator, receiver) {
   for (var k in object) {
     if (hasOwnProperty.call(object, k)) {
@@ -67665,21 +68064,26 @@ var forEachObject = function forEachObject(object, iterator, receiver) {
     }
   }
 };
-
 /** @type {(x: unknown) => x is readonly unknown[]} */
+
+
 function isArray(x) {
   return toStr.call(x) === '[object Array]';
 }
-
 /** @type {import('.')._internal} */
+
+
 module.exports = function forEach(list, iterator, thisArg) {
   if (!isCallable(iterator)) {
     throw new TypeError('iterator must be a function');
   }
+
   var receiver;
+
   if (arguments.length >= 3) {
     receiver = thisArg;
   }
+
   if (isArray(list)) {
     forEachArray(list, iterator, receiver);
   } else if (typeof list === 'string') {
@@ -67699,32 +68103,37 @@ arguments[4][110][0].apply(exports,arguments)
 'use strict';
 
 var $Object = require('es-object-atoms');
-
 /** @type {import('./Object.getPrototypeOf')} */
+
+
 module.exports = $Object.getPrototypeOf || null;
 
 },{"es-object-atoms":273}],279:[function(require,module,exports){
 'use strict';
-
 /** @type {import('./Reflect.getPrototypeOf')} */
+
 module.exports = typeof Reflect !== 'undefined' && Reflect.getPrototypeOf || null;
 
 },{}],280:[function(require,module,exports){
 'use strict';
 
 var reflectGetProto = require('./Reflect.getPrototypeOf');
-var originalGetProto = require('./Object.getPrototypeOf');
-var getDunderProto = require('dunder-proto/get');
 
+var originalGetProto = require('./Object.getPrototypeOf');
+
+var getDunderProto = require('dunder-proto/get');
 /** @type {import('.')} */
+
+
 module.exports = reflectGetProto ? function getProto(O) {
   // @ts-expect-error TS can't narrow inside a closure, for some reason
   return reflectGetProto(O);
 } : originalGetProto ? function getProto(O) {
   if (!O || typeof O !== 'object' && typeof O !== 'function') {
     throw new TypeError('getProto: not an object');
-  }
-  // @ts-expect-error TS can't narrow inside a closure, for some reason
+  } // @ts-expect-error TS can't narrow inside a closure, for some reason
+
+
   return originalGetProto(O);
 } : getDunderProto ? function getProto(O) {
   // @ts-expect-error TS can't narrow inside a closure, for some reason
@@ -67733,15 +68142,16 @@ module.exports = reflectGetProto ? function getProto(O) {
 
 },{"./Object.getPrototypeOf":278,"./Reflect.getPrototypeOf":279,"dunder-proto/get":264}],281:[function(require,module,exports){
 'use strict';
-
 /** @type {import('./gOPD')} */
+
 module.exports = Object.getOwnPropertyDescriptor;
 
 },{}],282:[function(require,module,exports){
 'use strict';
-
 /** @type {import('.')} */
+
 var $gOPD = require('./gOPD');
+
 if ($gOPD) {
   try {
     $gOPD([], 'length');
@@ -67750,6 +68160,7 @@ if ($gOPD) {
     $gOPD = null;
   }
 }
+
 module.exports = $gOPD;
 
 },{"./gOPD":281}],283:[function(require,module,exports){
@@ -67758,85 +68169,107 @@ arguments[4][116][0].apply(exports,arguments)
 'use strict';
 
 var origSymbol = typeof Symbol !== 'undefined' && Symbol;
-var hasSymbolSham = require('./shams');
 
+var hasSymbolSham = require('./shams');
 /** @type {import('.')} */
+
+
 module.exports = function hasNativeSymbols() {
   if (typeof origSymbol !== 'function') {
     return false;
   }
+
   if (typeof Symbol !== 'function') {
     return false;
   }
+
   if (typeof origSymbol('foo') !== 'symbol') {
     return false;
   }
+
   if (typeof Symbol('bar') !== 'symbol') {
     return false;
   }
+
   return hasSymbolSham();
 };
 
 },{"./shams":285}],285:[function(require,module,exports){
 'use strict';
-
 /** @type {import('./shams')} */
+
 /* eslint complexity: [2, 18], max-statements: [2, 33] */
+
 module.exports = function hasSymbols() {
   if (typeof Symbol !== 'function' || typeof Object.getOwnPropertySymbols !== 'function') {
     return false;
   }
+
   if (typeof Symbol.iterator === 'symbol') {
     return true;
   }
-
   /** @type {{ [k in symbol]?: unknown }} */
+
+
   var obj = {};
   var sym = Symbol('test');
   var symObj = Object(sym);
+
   if (typeof sym === 'string') {
     return false;
   }
+
   if (Object.prototype.toString.call(sym) !== '[object Symbol]') {
     return false;
   }
+
   if (Object.prototype.toString.call(symObj) !== '[object Symbol]') {
     return false;
-  }
-
-  // temp disabled per https://github.com/ljharb/object.assign/issues/17
+  } // temp disabled per https://github.com/ljharb/object.assign/issues/17
   // if (sym instanceof Symbol) { return false; }
   // temp disabled per https://github.com/WebReflection/get-own-property-symbols/issues/4
   // if (!(symObj instanceof Symbol)) { return false; }
-
   // if (typeof Symbol.prototype.toString !== 'function') { return false; }
   // if (String(sym) !== Symbol.prototype.toString.call(sym)) { return false; }
 
+
   var symVal = 42;
   obj[sym] = symVal;
+
   for (var _ in obj) {
     return false;
   } // eslint-disable-line no-restricted-syntax, no-unreachable-loop
+
+
   if (typeof Object.keys === 'function' && Object.keys(obj).length !== 0) {
     return false;
   }
+
   if (typeof Object.getOwnPropertyNames === 'function' && Object.getOwnPropertyNames(obj).length !== 0) {
     return false;
   }
+
   var syms = Object.getOwnPropertySymbols(obj);
+
   if (syms.length !== 1 || syms[0] !== sym) {
     return false;
   }
+
   if (!Object.prototype.propertyIsEnumerable.call(obj, sym)) {
     return false;
   }
+
   if (typeof Object.getOwnPropertyDescriptor === 'function') {
     // eslint-disable-next-line no-extra-parens
-    var descriptor = /** @type {PropertyDescriptor} */Object.getOwnPropertyDescriptor(obj, sym);
+    var descriptor =
+    /** @type {PropertyDescriptor} */
+    Object.getOwnPropertyDescriptor(obj, sym);
+
     if (descriptor.value !== symVal || descriptor.enumerable !== true) {
       return false;
     }
   }
+
   return true;
 };
 
@@ -67844,8 +68277,9 @@ module.exports = function hasSymbols() {
 'use strict';
 
 var hasSymbols = require('has-symbols/shams');
-
 /** @type {import('.')} */
+
+
 module.exports = function hasToStringTagShams() {
   return hasSymbols() && !!Symbol.toStringTag;
 };
@@ -67952,9 +68386,11 @@ module.exports = HashBase
 
 var call = Function.prototype.call;
 var $hasOwn = Object.prototype.hasOwnProperty;
-var bind = require('function-bind');
 
+var bind = require('function-bind');
 /** @type {import('.')} */
+
+
 module.exports = bind.call(call, $hasOwn);
 
 },{"function-bind":276}],289:[function(require,module,exports){
@@ -67965,8 +68401,9 @@ arguments[4][137][0].apply(exports,arguments)
 'use strict';
 
 var whichTypedArray = require('which-typed-array');
-
 /** @type {import('.')} */
+
+
 module.exports = function isTypedArray(value) {
   return !!whichTypedArray(value);
 };
@@ -67975,58 +68412,60 @@ module.exports = function isTypedArray(value) {
 arguments[4][139][0].apply(exports,arguments)
 },{"dup":139}],293:[function(require,module,exports){
 'use strict';
-
 /** @type {import('./abs')} */
+
 module.exports = Math.abs;
 
 },{}],294:[function(require,module,exports){
 'use strict';
-
 /** @type {import('./floor')} */
+
 module.exports = Math.floor;
 
 },{}],295:[function(require,module,exports){
 'use strict';
-
 /** @type {import('./isNaN')} */
+
 module.exports = Number.isNaN || function isNaN(a) {
   return a !== a;
 };
 
 },{}],296:[function(require,module,exports){
 'use strict';
-
 /** @type {import('./max')} */
+
 module.exports = Math.max;
 
 },{}],297:[function(require,module,exports){
 'use strict';
-
 /** @type {import('./min')} */
+
 module.exports = Math.min;
 
 },{}],298:[function(require,module,exports){
 'use strict';
-
 /** @type {import('./pow')} */
+
 module.exports = Math.pow;
 
 },{}],299:[function(require,module,exports){
 'use strict';
-
 /** @type {import('./round')} */
+
 module.exports = Math.round;
 
 },{}],300:[function(require,module,exports){
 'use strict';
 
 var $isNaN = require('./isNaN');
-
 /** @type {import('./sign')} */
+
+
 module.exports = function sign(number) {
   if ($isNaN(number) || number === 0) {
     return number;
   }
+
   return number < 0 ? -1 : +1;
 };
 
@@ -68181,8 +68620,8 @@ module.exports = MD5
 }).call(this)}).call(this,require("buffer").Buffer)
 },{"buffer":48,"hash-base":287,"inherits":289}],302:[function(require,module,exports){
 'use strict';
-
 /** @type {import('.')} */
+
 module.exports = ['Float16Array', 'Float32Array', 'Float64Array', 'Int8Array', 'Int16Array', 'Int32Array', 'Uint8Array', 'Uint8ClampedArray', 'Uint16Array', 'Uint32Array', 'BigInt64Array', 'BigUint64Array'];
 
 },{}],303:[function(require,module,exports){
@@ -68356,39 +68795,55 @@ arguments[4][184][0].apply(exports,arguments)
 'use strict';
 
 var GetIntrinsic = require('get-intrinsic');
-var define = require('define-data-property');
-var hasDescriptors = require('has-property-descriptors')();
-var gOPD = require('gopd');
-var $TypeError = require('es-errors/type');
-var $floor = GetIntrinsic('%Math.floor%');
 
+var define = require('define-data-property');
+
+var hasDescriptors = require('has-property-descriptors')();
+
+var gOPD = require('gopd');
+
+var $TypeError = require('es-errors/type');
+
+var $floor = GetIntrinsic('%Math.floor%');
 /** @type {import('.')} */
+
 module.exports = function setFunctionLength(fn, length) {
   if (typeof fn !== 'function') {
     throw new $TypeError('`fn` is not a function');
   }
+
   if (typeof length !== 'number' || length < 0 || length > 0xFFFFFFFF || $floor(length) !== length) {
     throw new $TypeError('`length` must be a positive 32-bit integer');
   }
+
   var loose = arguments.length > 2 && !!arguments[2];
   var functionLengthIsConfigurable = true;
   var functionLengthIsWritable = true;
+
   if ('length' in fn && gOPD) {
     var desc = gOPD(fn, 'length');
+
     if (desc && !desc.configurable) {
       functionLengthIsConfigurable = false;
     }
+
     if (desc && !desc.writable) {
       functionLengthIsWritable = false;
     }
   }
+
   if (functionLengthIsConfigurable || functionLengthIsWritable || !loose) {
     if (hasDescriptors) {
-      define(/** @type {Parameters<define>[0]} */fn, 'length', length, true, true);
+      define(
+      /** @type {Parameters<define>[0]} */
+      fn, 'length', length, true, true);
     } else {
-      define(/** @type {Parameters<define>[0]} */fn, 'length', length);
+      define(
+      /** @type {Parameters<define>[0]} */
+      fn, 'length', length);
     }
   }
+
   return fn;
 };
 
@@ -68527,18 +68982,23 @@ arguments[4][190][0].apply(exports,arguments)
 'use strict';
 
 var $TypeError = require('es-errors/type');
+
 var callBound = require('call-bound');
-
 /** @type {undefined | ((thisArg: import('.').TypedArray) => Buffer<ArrayBufferLike>)} */
-var $typedArrayBuffer = callBound('TypedArray.prototype.buffer', true);
-var isTypedArray = require('is-typed-array');
 
+
+var $typedArrayBuffer = callBound('TypedArray.prototype.buffer', true);
+
+var isTypedArray = require('is-typed-array');
 /** @type {import('.')} */
 // node <= 0.10, < 0.11.4 has a nonconfigurable own property instead of a prototype getter
+
+
 module.exports = $typedArrayBuffer || function typedArrayBuffer(x) {
   if (!isTypedArray(x)) {
     throw new $TypeError('Not a Typed Array');
   }
+
   return x.buffer;
 };
 
@@ -68694,6 +69154,7 @@ exports.readUInt64 = readUInt64;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.ValiError = exports.UUID_REGEX = exports.ULID_REGEX = exports.SLUG_REGEX = exports.RFC_EMAIL_REGEX = exports.OCTAL_REGEX = exports.NANO_ID_REGEX = exports.MAC_REGEX = exports.MAC64_REGEX = exports.MAC48_REGEX = exports.ISO_WEEK_REGEX = exports.ISO_TIME_SECOND_REGEX = exports.ISO_TIME_REGEX = exports.ISO_TIMESTAMP_REGEX = exports.ISO_DATE_TIME_REGEX = exports.ISO_DATE_REGEX = exports.IP_REGEX = exports.IPV6_REGEX = exports.IPV4_REGEX = exports.IMEI_REGEX = exports.HEX_COLOR_REGEX = exports.HEXADECIMAL_REGEX = exports.EMOJI_REGEX = exports.EMAIL_REGEX = exports.DIGITS_REGEX = exports.DECIMAL_REGEX = exports.CUID2_REGEX = exports.BIC_REGEX = exports.BASE64_REGEX = void 0;
 exports._addIssue = _addIssue;
 exports._getByteCount = _getByteCount;
 exports._getGraphemeCount = _getGraphemeCount;
@@ -68952,7 +69413,6 @@ exports.variant = variant;
 exports.variantAsync = variantAsync;
 exports.void_ = exports.void = void_;
 exports.words = words;
-exports.ValiError = exports.UUID_REGEX = exports.ULID_REGEX = exports.SLUG_REGEX = exports.RFC_EMAIL_REGEX = exports.OCTAL_REGEX = exports.NANO_ID_REGEX = exports.MAC_REGEX = exports.MAC64_REGEX = exports.MAC48_REGEX = exports.ISO_WEEK_REGEX = exports.ISO_TIME_SECOND_REGEX = exports.ISO_TIME_REGEX = exports.ISO_TIMESTAMP_REGEX = exports.ISO_DATE_TIME_REGEX = exports.ISO_DATE_REGEX = exports.IP_REGEX = exports.IPV6_REGEX = exports.IPV4_REGEX = exports.IMEI_REGEX = exports.HEX_COLOR_REGEX = exports.HEXADECIMAL_REGEX = exports.EMOJI_REGEX = exports.EMAIL_REGEX = exports.DIGITS_REGEX = exports.DECIMAL_REGEX = exports.CUID2_REGEX = exports.BIC_REGEX = exports.BASE64_REGEX = void 0;
 //#region src/storages/globalConfig/globalConfig.ts
 let store$4;
 /**
@@ -68960,9 +69420,9 @@ let store$4;
 *
 * @param config The configuration.
 */
+
 function setGlobalConfig(config$1) {
-  store$4 = {
-    ...store$4,
+  store$4 = { ...store$4,
     ...config$1
   };
 }
@@ -68973,7 +69433,10 @@ function setGlobalConfig(config$1) {
 *
 * @returns The configuration.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function getGlobalConfig(config$1) {
   return {
     lang: config$1?.lang ?? store$4?.lang,
@@ -68985,12 +69448,14 @@ function getGlobalConfig(config$1) {
 /**
 * Deletes the global configuration.
 */
+
+
 function deleteGlobalConfig() {
   store$4 = void 0;
-}
-
-//#endregion
+} //#endregion
 //#region src/storages/globalMessage/globalMessage.ts
+
+
 let store$3;
 /**
 * Sets a global error message.
@@ -68998,6 +69463,7 @@ let store$3;
 * @param message The error message.
 * @param lang The language of the message.
 */
+
 function setGlobalMessage(message$1, lang) {
   if (!store$3) store$3 = /* @__PURE__ */new Map();
   store$3.set(lang, message$1);
@@ -69009,7 +69475,10 @@ function setGlobalMessage(message$1, lang) {
 *
 * @returns The error message.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function getGlobalMessage(lang) {
   return store$3?.get(lang);
 }
@@ -69018,12 +69487,14 @@ function getGlobalMessage(lang) {
 *
 * @param lang The language of the message.
 */
+
+
 function deleteGlobalMessage(lang) {
   store$3?.delete(lang);
-}
-
-//#endregion
+} //#endregion
 //#region src/storages/schemaMessage/schemaMessage.ts
+
+
 let store$2;
 /**
 * Sets a schema error message.
@@ -69031,6 +69502,7 @@ let store$2;
 * @param message The error message.
 * @param lang The language of the message.
 */
+
 function setSchemaMessage(message$1, lang) {
   if (!store$2) store$2 = /* @__PURE__ */new Map();
   store$2.set(lang, message$1);
@@ -69042,7 +69514,10 @@ function setSchemaMessage(message$1, lang) {
 *
 * @returns The error message.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function getSchemaMessage(lang) {
   return store$2?.get(lang);
 }
@@ -69051,12 +69526,14 @@ function getSchemaMessage(lang) {
 *
 * @param lang The language of the message.
 */
+
+
 function deleteSchemaMessage(lang) {
   store$2?.delete(lang);
-}
-
-//#endregion
+} //#endregion
 //#region src/storages/specificMessage/specificMessage.ts
+
+
 let store$1;
 /**
 * Sets a specific error message.
@@ -69065,6 +69542,7 @@ let store$1;
 * @param message The error message.
 * @param lang The language of the message.
 */
+
 function setSpecificMessage(reference, message$1, lang) {
   if (!store$1) store$1 = /* @__PURE__ */new Map();
   if (!store$1.get(reference)) store$1.set(reference, /* @__PURE__ */new Map());
@@ -69078,7 +69556,10 @@ function setSpecificMessage(reference, message$1, lang) {
 *
 * @returns The error message.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function getSpecificMessage(reference, lang) {
   return store$1?.get(reference)?.get(lang);
 }
@@ -69088,12 +69569,13 @@ function getSpecificMessage(reference, lang) {
 * @param reference The identifier reference.
 * @param lang The language of the message.
 */
+
+
 function deleteSpecificMessage(reference, lang) {
   store$1?.get(reference)?.delete(lang);
-}
-
-//#endregion
+} //#endregion
 //#region src/utils/_stringify/_stringify.ts
+
 /**
 * Stringifies an unknown input to a literal or type string.
 *
@@ -69103,17 +69585,19 @@ function deleteSpecificMessage(reference, lang) {
 *
 * @internal
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function _stringify(input) {
   const type = typeof input;
   if (type === "string") return `"${input}"`;
   if (type === "number" || type === "bigint" || type === "boolean") return `${input}`;
   if (type === "object" || type === "function") return (input && Object.getPrototypeOf(input)?.constructor?.name) ?? "null";
   return type;
-}
-
-//#endregion
+} //#endregion
 //#region src/utils/_addIssue/_addIssue.ts
+
 /**
 * Adds an issue to the dataset.
 *
@@ -69125,10 +69609,14 @@ function _stringify(input) {
 *
 * @internal
 */
+
+
 function _addIssue(context, label, dataset, config$1, other) {
   const input = other && "input" in other ? other.input : dataset.value;
   const expected = other?.expected ?? context.expects ?? null;
+
   const received = other?.received ?? /* @__PURE__ */_stringify(input);
+
   const issue = {
     kind: context.kind,
     type: context.type,
@@ -69148,10 +69636,10 @@ function _addIssue(context, label, dataset, config$1, other) {
   if (message$1 !== void 0) issue.message = typeof message$1 === "function" ? message$1(issue) : message$1;
   if (isSchema) dataset.typed = false;
   if (dataset.issues) dataset.issues.push(issue);else dataset.issues = [issue];
-}
-
-//#endregion
+} //#endregion
 //#region src/utils/_getByteCount/_getByteCount.ts
+
+
 let textEncoder;
 /**
 * Returns the byte count of the input.
@@ -69162,14 +69650,16 @@ let textEncoder;
 *
 * @internal
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
 function _getByteCount(input) {
   if (!textEncoder) textEncoder = new TextEncoder();
   return textEncoder.encode(input).length;
-}
-
-//#endregion
+} //#endregion
 //#region src/utils/_getGraphemeCount/_getGraphemeCount.ts
+
+
 let segmenter;
 /**
 * Returns the grapheme count of the input.
@@ -69180,17 +69670,20 @@ let segmenter;
 *
 * @internal
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
 function _getGraphemeCount(input) {
   if (!segmenter) segmenter = new Intl.Segmenter();
   const segments = segmenter.segment(input);
   let count = 0;
-  for (const _ of segments) count++;
-  return count;
-}
 
-//#endregion
+  for (const _ of segments) count++;
+
+  return count;
+} //#endregion
 //#region src/utils/_getLastMetadata/_getLastMetadata.ts
+
 /**
 * Returns the last top-level value of a given metadata type from a schema
 * using a breadth-first search that starts with the last item in the pipeline.
@@ -69202,23 +69695,28 @@ function _getGraphemeCount(input) {
 *
 * @internal
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function _getLastMetadata(schema, type) {
   if ("pipe" in schema) {
     const nestedSchemas = [];
+
     for (let index = schema.pipe.length - 1; index >= 0; index--) {
       const item = schema.pipe[index];
       if (item.kind === "schema" && "pipe" in item) nestedSchemas.push(item);else if (item.kind === "metadata" && item.type === type) return item[type];
     }
+
     for (const nestedSchema of nestedSchemas) {
       const result = /* @__PURE__ */_getLastMetadata(nestedSchema, type);
+
       if (result !== void 0) return result;
     }
   }
-}
-
-//#endregion
+} //#endregion
 //#region src/utils/_getStandardProps/_getStandardProps.ts
+
 /**
 * Returns the Standard Schema properties.
 *
@@ -69226,21 +69724,26 @@ function _getLastMetadata(schema, type) {
 *
 * @returns The Standard Schema properties.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function _getStandardProps(context) {
   return {
     version: 1,
     vendor: "valibot",
+
     validate(value$1) {
       return context["~run"]({
         value: value$1
       }, /* @__PURE__ */getGlobalConfig());
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/utils/_getWordCount/_getWordCount.ts
+
+
 let store;
 /**
 * Returns the word count of the input.
@@ -69252,7 +69755,9 @@ let store;
 *
 * @internal
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
 function _getWordCount(locales, input) {
   if (!store) store = /* @__PURE__ */new Map();
   if (!store.get(locales)) store.set(locales, new Intl.Segmenter(locales, {
@@ -69260,15 +69765,18 @@ function _getWordCount(locales, input) {
   }));
   const segments = store.get(locales).segment(input);
   let count = 0;
-  for (const segment of segments) if (segment.isWordLike) count++;
-  return count;
-}
 
-//#endregion
+  for (const segment of segments) if (segment.isWordLike) count++;
+
+  return count;
+} //#endregion
 //#region src/utils/_isLuhnAlgo/_isLuhnAlgo.ts
+
 /**
 * Non-digit regex.
 */
+
+
 const NON_DIGIT_REGEX = /\D/gu;
 /**
 * Checks whether a string with numbers corresponds to the luhn algorithm.
@@ -69279,22 +69787,25 @@ const NON_DIGIT_REGEX = /\D/gu;
 *
 * @internal
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
 function _isLuhnAlgo(input) {
   const number$1 = input.replace(NON_DIGIT_REGEX, "");
   let length$1 = number$1.length;
   let bit = 1;
   let sum = 0;
+
   while (length$1) {
     const value$1 = +number$1[--length$1];
     bit ^= 1;
     sum += bit ? [0, 2, 4, 6, 8, 1, 3, 5, 7, 9][value$1] : value$1;
   }
-  return sum % 10 === 0;
-}
 
-//#endregion
+  return sum % 10 === 0;
+} //#endregion
 //#region src/utils/_isValidObjectKey/_isValidObjectKey.ts
+
 /**
 * Disallows inherited object properties and prevents object prototype
 * pollution by disallowing certain keys.
@@ -69306,13 +69817,15 @@ function _isLuhnAlgo(input) {
 *
 * @internal
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function _isValidObjectKey(object$1, key) {
   return Object.hasOwn(object$1, key) && key !== "__proto__" && key !== "prototype" && key !== "constructor";
-}
-
-//#endregion
+} //#endregion
 //#region src/utils/_joinExpects/_joinExpects.ts
+
 /**
 * Joins multiple `expects` values with the given separator.
 *
@@ -69323,15 +69836,17 @@ function _isValidObjectKey(object$1, key) {
 *
 * @internal
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function _joinExpects(values$1, separator) {
   const list = [...new Set(values$1)];
   if (list.length > 1) return `(${list.join(` ${separator} `)})`;
   return list[0] ?? "never";
-}
-
-//#endregion
+} //#endregion
 //#region src/utils/entriesFromList/entriesFromList.ts
+
 /**
 * Creates an object entries definition from a list of keys and a schema.
 *
@@ -69340,38 +69855,49 @@ function _joinExpects(values$1, separator) {
 *
 * @returns The object entries.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function entriesFromList(list, schema) {
   const entries$1 = {};
-  for (const key of list) entries$1[key] = schema;
-  return entries$1;
-}
 
-//#endregion
+  for (const key of list) entries$1[key] = schema;
+
+  return entries$1;
+} //#endregion
 //#region src/utils/entriesFromObjects/entriesFromObjects.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function entriesFromObjects(schemas) {
   const entries$1 = {};
-  for (const schema of schemas) Object.assign(entries$1, schema.entries);
-  return entries$1;
-}
 
-//#endregion
+  for (const schema of schemas) Object.assign(entries$1, schema.entries);
+
+  return entries$1;
+} //#endregion
 //#region src/utils/getDotPath/getDotPath.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function getDotPath(issue) {
   if (issue.path) {
     let key = "";
+
     for (const item of issue.path) if (typeof item.key === "string" || typeof item.key === "number") {
       if (key) key += `.${item.key}`;else key += item.key;
     } else return null;
+
     return key;
   }
-  return null;
-}
 
-//#endregion
+  return null;
+} //#endregion
 //#region src/utils/isOfKind/isOfKind.ts
+
 /**
 * A generic type guard to check the kind of an object.
 *
@@ -69380,13 +69906,15 @@ function getDotPath(issue) {
 *
 * @returns Whether it matches.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function isOfKind(kind, object$1) {
   return object$1.kind === kind;
-}
-
-//#endregion
+} //#endregion
 //#region src/utils/isOfType/isOfType.ts
+
 /**
 * A generic type guard to check the type of an object.
 *
@@ -69395,13 +69923,15 @@ function isOfKind(kind, object$1) {
 *
 * @returns Whether it matches.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function isOfType(type, object$1) {
   return object$1.type === type;
-}
-
-//#endregion
+} //#endregion
 //#region src/utils/isValiError/isValiError.ts
+
 /**
 * A type guard to check if an error is a ValiError.
 *
@@ -69409,16 +69939,20 @@ function isOfType(type, object$1) {
 *
 * @returns Whether its a ValiError.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function isValiError(error) {
   return error instanceof ValiError;
-}
-
-//#endregion
+} //#endregion
 //#region src/utils/ValiError/ValiError.ts
+
 /**
 * A Valibot error with useful information.
 */
+
+
 var ValiError = class extends Error {
   /**
   * Creates a Valibot error with useful information.
@@ -69430,12 +69964,14 @@ var ValiError = class extends Error {
     this.name = "ValiError";
     this.issues = issues;
   }
-};
 
-//#endregion
+}; //#endregion
 //#region src/actions/args/args.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
 exports.ValiError = ValiError;
+
 function args(schema) {
   return {
     kind: "transformation",
@@ -69443,8 +69979,10 @@ function args(schema) {
     reference: args,
     async: false,
     schema,
+
     "~run"(dataset, config$1) {
       const func = dataset.value;
+
       dataset.value = (...args_) => {
         const argsDataset = this.schema["~run"]({
           value: args_
@@ -69452,14 +69990,17 @@ function args(schema) {
         if (argsDataset.issues) throw new ValiError(argsDataset.issues);
         return func(...argsDataset.value);
       };
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/args/argsAsync.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function argsAsync(schema) {
   return {
     kind: "transformation",
@@ -69467,8 +70008,10 @@ function argsAsync(schema) {
     reference: argsAsync,
     async: false,
     schema,
+
     "~run"(dataset, config$1) {
       const func = dataset.value;
+
       dataset.value = async (...args$1) => {
         const argsDataset = await schema["~run"]({
           value: args$1
@@ -69476,61 +70019,73 @@ function argsAsync(schema) {
         if (argsDataset.issues) throw new ValiError(argsDataset.issues);
         return func(...argsDataset.value);
       };
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/await/awaitAsync.ts
+
 /**
 * Creates an await transformation action.
 *
 * @returns An await action.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function awaitAsync() {
   return {
     kind: "transformation",
     type: "await",
     reference: awaitAsync,
     async: true,
+
     async "~run"(dataset) {
       dataset.value = await dataset.value;
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/regex.ts
+
 /**
 * [Base64](https://en.wikipedia.org/wiki/Base64) regex.
 */
+
+
 const BASE64_REGEX = /^(?:[\da-z+/]{4})*(?:[\da-z+/]{2}==|[\da-z+/]{3}=)?$/iu;
 /**
 * [BIC](https://en.wikipedia.org/wiki/ISO_9362) regex.
 */
+
 exports.BASE64_REGEX = BASE64_REGEX;
 const BIC_REGEX = /^[A-Z]{6}(?!00)[\dA-Z]{2}(?:[\dA-Z]{3})?$/u;
 /**
 * [Cuid2](https://github.com/paralleldrive/cuid2) regex.
 */
+
 exports.BIC_REGEX = BIC_REGEX;
 const CUID2_REGEX = /^[a-z][\da-z]*$/u;
 /**
 * [Decimal](https://en.wikipedia.org/wiki/Decimal) regex.
 */
+
 exports.CUID2_REGEX = CUID2_REGEX;
 const DECIMAL_REGEX = /^[+-]?(?:\d*\.)?\d+$/u;
 /**
 * [Digits](https://en.wikipedia.org/wiki/Numerical_digit) regex.
 */
+
 exports.DECIMAL_REGEX = DECIMAL_REGEX;
 const DIGITS_REGEX = /^\d+$/u;
 /**
 * [Email address](https://en.wikipedia.org/wiki/Email_address) regex.
 */
+
 exports.DIGITS_REGEX = DIGITS_REGEX;
 const EMAIL_REGEX = /^[\w+-]+(?:\.[\w+-]+)*@[\da-z]+(?:[.-][\da-z]+)*\.[a-z]{2,}$/iu;
 /**
@@ -69539,6 +70094,7 @@ const EMAIL_REGEX = /^[\w+-]+(?:\.[\w+-]+)*@[\da-z]+(?:[.-][\da-z]+)*\.[a-z]{2,}
 * Hint: We decided against the newer `/^\p{RGI_Emoji}+$/v` regex because it is
 * not supported in older runtimes and does not match all emoji.
 */
+
 exports.EMAIL_REGEX = EMAIL_REGEX;
 const EMOJI_REGEX = /^(?:[\u{1F1E6}-\u{1F1FF}]{2}|\u{1F3F4}[\u{E0061}-\u{E007A}]{2}[\u{E0030}-\u{E0039}\u{E0061}-\u{E007A}]{1,3}\u{E007F}|(?:\p{Emoji}\uFE0F\u20E3?|\p{Emoji_Modifier_Base}\p{Emoji_Modifier}?|(?![\p{Emoji_Modifier_Base}\u{1F1E6}-\u{1F1FF}])\p{Emoji_Presentation})(?:\u200D(?:\p{Emoji}\uFE0F\u20E3?|\p{Emoji_Modifier_Base}\p{Emoji_Modifier}?|(?![\p{Emoji_Modifier_Base}\u{1F1E6}-\u{1F1FF}])\p{Emoji_Presentation}))*)+$/u;
 /**
@@ -69546,6 +70102,7 @@ const EMOJI_REGEX = /^(?:[\u{1F1E6}-\u{1F1FF}]{2}|\u{1F3F4}[\u{E0061}-\u{E007A}]
 *
 * Hint: We decided against the `i` flag for better JSON Schema compatibility.
 */
+
 exports.EMOJI_REGEX = EMOJI_REGEX;
 const HEXADECIMAL_REGEX = /^(?:0[hx])?[\da-fA-F]+$/u;
 /**
@@ -69553,81 +70110,97 @@ const HEXADECIMAL_REGEX = /^(?:0[hx])?[\da-fA-F]+$/u;
 *
 * Hint: We decided against the `i` flag for better JSON Schema compatibility.
 */
+
 exports.HEXADECIMAL_REGEX = HEXADECIMAL_REGEX;
 const HEX_COLOR_REGEX = /^#(?:[\da-fA-F]{3,4}|[\da-fA-F]{6}|[\da-fA-F]{8})$/u;
 /**
 * [IMEI](https://en.wikipedia.org/wiki/International_Mobile_Equipment_Identity) regex.
 */
+
 exports.HEX_COLOR_REGEX = HEX_COLOR_REGEX;
 const IMEI_REGEX = /^\d{15}$|^\d{2}-\d{6}-\d{6}-\d$/u;
 /**
 * [IPv4](https://en.wikipedia.org/wiki/IPv4) regex.
 */
+
 exports.IMEI_REGEX = IMEI_REGEX;
 const IPV4_REGEX = /^(?:(?:[1-9]|1\d|2[0-4])?\d|25[0-5])(?:\.(?:(?:[1-9]|1\d|2[0-4])?\d|25[0-5])){3}$/u;
 /**
 * [IPv6](https://en.wikipedia.org/wiki/IPv6) regex.
 */
+
 exports.IPV4_REGEX = IPV4_REGEX;
 const IPV6_REGEX = /^(?:(?:[\da-f]{1,4}:){7}[\da-f]{1,4}|(?:[\da-f]{1,4}:){1,7}:|(?:[\da-f]{1,4}:){1,6}:[\da-f]{1,4}|(?:[\da-f]{1,4}:){1,5}(?::[\da-f]{1,4}){1,2}|(?:[\da-f]{1,4}:){1,4}(?::[\da-f]{1,4}){1,3}|(?:[\da-f]{1,4}:){1,3}(?::[\da-f]{1,4}){1,4}|(?:[\da-f]{1,4}:){1,2}(?::[\da-f]{1,4}){1,5}|[\da-f]{1,4}:(?::[\da-f]{1,4}){1,6}|:(?:(?::[\da-f]{1,4}){1,7}|:)|fe80:(?::[\da-f]{0,4}){0,4}%[\da-z]+|::(?:f{4}(?::0{1,4})?:)?(?:(?:25[0-5]|(?:2[0-4]|1?\d)?\d)\.){3}(?:25[0-5]|(?:2[0-4]|1?\d)?\d)|(?:[\da-f]{1,4}:){1,4}:(?:(?:25[0-5]|(?:2[0-4]|1?\d)?\d)\.){3}(?:25[0-5]|(?:2[0-4]|1?\d)?\d))$/iu;
 /**
 * [IP](https://en.wikipedia.org/wiki/IP_address) regex.
 */
+
 exports.IPV6_REGEX = IPV6_REGEX;
 const IP_REGEX = /^(?:(?:[1-9]|1\d|2[0-4])?\d|25[0-5])(?:\.(?:(?:[1-9]|1\d|2[0-4])?\d|25[0-5])){3}$|^(?:(?:[\da-f]{1,4}:){7}[\da-f]{1,4}|(?:[\da-f]{1,4}:){1,7}:|(?:[\da-f]{1,4}:){1,6}:[\da-f]{1,4}|(?:[\da-f]{1,4}:){1,5}(?::[\da-f]{1,4}){1,2}|(?:[\da-f]{1,4}:){1,4}(?::[\da-f]{1,4}){1,3}|(?:[\da-f]{1,4}:){1,3}(?::[\da-f]{1,4}){1,4}|(?:[\da-f]{1,4}:){1,2}(?::[\da-f]{1,4}){1,5}|[\da-f]{1,4}:(?::[\da-f]{1,4}){1,6}|:(?:(?::[\da-f]{1,4}){1,7}|:)|fe80:(?::[\da-f]{0,4}){0,4}%[\da-z]+|::(?:f{4}(?::0{1,4})?:)?(?:(?:25[0-5]|(?:2[0-4]|1?\d)?\d)\.){3}(?:25[0-5]|(?:2[0-4]|1?\d)?\d)|(?:[\da-f]{1,4}:){1,4}:(?:(?:25[0-5]|(?:2[0-4]|1?\d)?\d)\.){3}(?:25[0-5]|(?:2[0-4]|1?\d)?\d))$/iu;
 /**
 * [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) date regex.
 */
+
 exports.IP_REGEX = IP_REGEX;
 const ISO_DATE_REGEX = /^\d{4}-(?:0[1-9]|1[0-2])-(?:[12]\d|0[1-9]|3[01])$/u;
 /**
 * [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) date-time regex.
 */
+
 exports.ISO_DATE_REGEX = ISO_DATE_REGEX;
 const ISO_DATE_TIME_REGEX = /^\d{4}-(?:0[1-9]|1[0-2])-(?:[12]\d|0[1-9]|3[01])[T ](?:0\d|1\d|2[0-3]):[0-5]\d$/u;
 /**
 * [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) time regex.
 */
+
 exports.ISO_DATE_TIME_REGEX = ISO_DATE_TIME_REGEX;
 const ISO_TIME_REGEX = /^(?:0\d|1\d|2[0-3]):[0-5]\d$/u;
 /**
 * [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) time with seconds regex.
 */
+
 exports.ISO_TIME_REGEX = ISO_TIME_REGEX;
 const ISO_TIME_SECOND_REGEX = /^(?:0\d|1\d|2[0-3])(?::[0-5]\d){2}$/u;
 /**
 * [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp regex.
 */
+
 exports.ISO_TIME_SECOND_REGEX = ISO_TIME_SECOND_REGEX;
 const ISO_TIMESTAMP_REGEX = /^\d{4}-(?:0[1-9]|1[0-2])-(?:[12]\d|0[1-9]|3[01])[T ](?:0\d|1\d|2[0-3])(?::[0-5]\d){2}(?:\.\d{1,9})?(?:Z|[+-](?:0\d|1\d|2[0-3])(?::?[0-5]\d)?)$/u;
 /**
 * [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) week regex.
 */
+
 exports.ISO_TIMESTAMP_REGEX = ISO_TIMESTAMP_REGEX;
 const ISO_WEEK_REGEX = /^\d{4}-W(?:0[1-9]|[1-4]\d|5[0-3])$/u;
 /**
 * [MAC](https://en.wikipedia.org/wiki/MAC_address) 48 bit regex.
 */
+
 exports.ISO_WEEK_REGEX = ISO_WEEK_REGEX;
 const MAC48_REGEX = /^(?:[\da-f]{2}:){5}[\da-f]{2}$|^(?:[\da-f]{2}-){5}[\da-f]{2}$|^(?:[\da-f]{4}\.){2}[\da-f]{4}$/iu;
 /**
 * [MAC](https://en.wikipedia.org/wiki/MAC_address) 64 bit regex.
 */
+
 exports.MAC48_REGEX = MAC48_REGEX;
 const MAC64_REGEX = /^(?:[\da-f]{2}:){7}[\da-f]{2}$|^(?:[\da-f]{2}-){7}[\da-f]{2}$|^(?:[\da-f]{4}\.){3}[\da-f]{4}$|^(?:[\da-f]{4}:){3}[\da-f]{4}$/iu;
 /**
 * [MAC](https://en.wikipedia.org/wiki/MAC_address) regex.
 */
+
 exports.MAC64_REGEX = MAC64_REGEX;
 const MAC_REGEX = /^(?:[\da-f]{2}:){5}[\da-f]{2}$|^(?:[\da-f]{2}-){5}[\da-f]{2}$|^(?:[\da-f]{4}\.){2}[\da-f]{4}$|^(?:[\da-f]{2}:){7}[\da-f]{2}$|^(?:[\da-f]{2}-){7}[\da-f]{2}$|^(?:[\da-f]{4}\.){3}[\da-f]{4}$|^(?:[\da-f]{4}:){3}[\da-f]{4}$/iu;
 /**
 * [Nano ID](https://github.com/ai/nanoid) regex.
 */
+
 exports.MAC_REGEX = MAC_REGEX;
 const NANO_ID_REGEX = /^[\w-]+$/u;
 /**
 * [Octal](https://en.wikipedia.org/wiki/Octal) regex.
 */
+
 exports.NANO_ID_REGEX = NANO_ID_REGEX;
 const OCTAL_REGEX = /^(?:0o)?[0-7]+$/u;
 /**
@@ -69635,11 +70208,13 @@ const OCTAL_REGEX = /^(?:0o)?[0-7]+$/u;
 *
 * Hint: This regex was taken from the [HTML Living Standard Specification](https://html.spec.whatwg.org/multipage/input.html#valid-e-mail-address) and does not perfectly represent RFC 5322.
 */
+
 exports.OCTAL_REGEX = OCTAL_REGEX;
 const RFC_EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
 /**
 * [Slug](https://en.wikipedia.org/wiki/Clean_URL#Slug) regex.
 */
+
 exports.RFC_EMAIL_REGEX = RFC_EMAIL_REGEX;
 const SLUG_REGEX = /^[\da-z]+(?:[-_][\da-z]+)*$/u;
 /**
@@ -69647,18 +70222,21 @@ const SLUG_REGEX = /^[\da-z]+(?:[-_][\da-z]+)*$/u;
 *
 * Hint: We decided against the `i` flag for better JSON Schema compatibility.
 */
+
 exports.SLUG_REGEX = SLUG_REGEX;
 const ULID_REGEX = /^[\da-hjkmnp-tv-zA-HJKMNP-TV-Z]{26}$/u;
 /**
 * [UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier) regex.
 */
-exports.ULID_REGEX = ULID_REGEX;
-const UUID_REGEX = /^[\da-f]{8}(?:-[\da-f]{4}){3}-[\da-f]{12}$/iu;
 
-//#endregion
+exports.ULID_REGEX = ULID_REGEX;
+const UUID_REGEX = /^[\da-f]{8}(?:-[\da-f]{4}){3}-[\da-f]{12}$/iu; //#endregion
 //#region src/actions/base64/base64.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
 exports.UUID_REGEX = UUID_REGEX;
+
 function base64(message$1) {
   return {
     kind: "validation",
@@ -69668,16 +70246,19 @@ function base64(message$1) {
     expects: null,
     requirement: BASE64_REGEX,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !this.requirement.test(dataset.value)) _addIssue(this, "Base64", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/bic/bic.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function bic(message$1) {
   return {
     kind: "validation",
@@ -69687,15 +70268,16 @@ function bic(message$1) {
     expects: null,
     requirement: BIC_REGEX,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !this.requirement.test(dataset.value)) _addIssue(this, "BIC", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/brand/brand.ts
+
 /**
 * Creates a brand transformation action.
 *
@@ -69703,7 +70285,10 @@ function bic(message$1) {
 *
 * @returns A brand action.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function brand(name) {
   return {
     kind: "transformation",
@@ -69711,15 +70296,18 @@ function brand(name) {
     reference: brand,
     async: false,
     name,
+
     "~run"(dataset) {
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/bytes/bytes.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function bytes(requirement, message$1) {
   return {
     kind: "validation",
@@ -69729,21 +70317,26 @@ function bytes(requirement, message$1) {
     expects: `${requirement}`,
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed) {
         const length$1 = /* @__PURE__ */_getByteCount(dataset.value);
+
         if (length$1 !== this.requirement) _addIssue(this, "bytes", dataset, config$1, {
           received: `${length$1}`
         });
       }
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/check/check.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function check(requirement, message$1) {
   return {
     kind: "validation",
@@ -69753,16 +70346,19 @@ function check(requirement, message$1) {
     expects: null,
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !this.requirement(dataset.value)) _addIssue(this, "input", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/check/checkAsync.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function checkAsync(requirement, message$1) {
   return {
     kind: "validation",
@@ -69772,16 +70368,19 @@ function checkAsync(requirement, message$1) {
     expects: null,
     requirement,
     message: message$1,
+
     async "~run"(dataset, config$1) {
       if (dataset.typed && !(await this.requirement(dataset.value))) _addIssue(this, "input", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/checkItems/checkItems.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function checkItems(requirement, message$1) {
   return {
     kind: "validation",
@@ -69791,6 +70390,7 @@ function checkItems(requirement, message$1) {
     expects: null,
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed) for (let index = 0; index < dataset.value.length; index++) {
         const item = dataset.value[index];
@@ -69807,12 +70407,14 @@ function checkItems(requirement, message$1) {
       }
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/checkItems/checkItemsAsync.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function checkItemsAsync(requirement, message$1) {
   return {
     kind: "validation",
@@ -69822,11 +70424,14 @@ function checkItemsAsync(requirement, message$1) {
     expects: null,
     requirement,
     message: message$1,
+
     async "~run"(dataset, config$1) {
       if (dataset.typed) {
         const requirementResults = await Promise.all(dataset.value.map(this.requirement));
+
         for (let index = 0; index < dataset.value.length; index++) if (!requirementResults[index]) {
           const item = dataset.value[index];
+
           _addIssue(this, "item", dataset, config$1, {
             input: item,
             path: [{
@@ -69839,26 +70444,32 @@ function checkItemsAsync(requirement, message$1) {
           });
         }
       }
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/creditCard/creditCard.ts
+
 /**
 * Credit card regex.
 */
+
+
 const CREDIT_CARD_REGEX = /^(?:\d{14,19}|\d{4}(?: \d{3,6}){2,4}|\d{4}(?:-\d{3,6}){2,4})$/u;
 /**
 * Sanitize regex.
 */
+
 const SANITIZE_REGEX = /[- ]/gu;
 /**
 * Provider regex list.
 */
+
 const PROVIDER_REGEX_LIST = [/^3[47]\d{13}$/u, /^3(?:0[0-5]|[68]\d)\d{11,13}$/u, /^6(?:011|5\d{2})\d{12,15}$/u, /^(?:2131|1800|35\d{3})\d{11}$/u, /^5[1-5]\d{2}|(?:222\d|22[3-9]\d|2[3-6]\d{2}|27[01]\d|2720)\d{12}$/u, /^(?:6[27]\d{14,17}|81\d{14,17})$/u, /^4\d{12}(?:\d{3,6})?$/u];
 /* @__NO_SIDE_EFFECTS__ */
+
 function creditCard(message$1) {
   return {
     kind: "validation",
@@ -69866,21 +70477,26 @@ function creditCard(message$1) {
     reference: creditCard,
     async: false,
     expects: null,
+
     requirement(input) {
       let sanitized;
       return CREDIT_CARD_REGEX.test(input) && (sanitized = input.replace(SANITIZE_REGEX, "")) && PROVIDER_REGEX_LIST.some(regex$1 => regex$1.test(sanitized)) && /* @__PURE__ */_isLuhnAlgo(sanitized);
     },
+
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !this.requirement(dataset.value)) _addIssue(this, "credit card", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/cuid2/cuid2.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function cuid2(message$1) {
   return {
     kind: "validation",
@@ -69890,16 +70506,19 @@ function cuid2(message$1) {
     expects: null,
     requirement: CUID2_REGEX,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !this.requirement.test(dataset.value)) _addIssue(this, "Cuid2", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/decimal/decimal.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function decimal(message$1) {
   return {
     kind: "validation",
@@ -69909,15 +70528,16 @@ function decimal(message$1) {
     expects: null,
     requirement: DECIMAL_REGEX,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !this.requirement.test(dataset.value)) _addIssue(this, "decimal", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/description/description.ts
+
 /**
 * Creates a description metadata action.
 *
@@ -69925,7 +70545,10 @@ function decimal(message$1) {
 *
 * @returns A description action.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function description(description_) {
   return {
     kind: "metadata",
@@ -69933,11 +70556,12 @@ function description(description_) {
     reference: description,
     description: description_
   };
-}
-
-//#endregion
+} //#endregion
 //#region src/actions/digits/digits.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function digits(message$1) {
   return {
     kind: "validation",
@@ -69947,16 +70571,19 @@ function digits(message$1) {
     expects: null,
     requirement: DIGITS_REGEX,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !this.requirement.test(dataset.value)) _addIssue(this, "digits", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/email/email.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function email(message$1) {
   return {
     kind: "validation",
@@ -69966,16 +70593,19 @@ function email(message$1) {
     async: false,
     requirement: EMAIL_REGEX,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !this.requirement.test(dataset.value)) _addIssue(this, "email", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/emoji/emoji.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function emoji(message$1) {
   return {
     kind: "validation",
@@ -69985,16 +70615,19 @@ function emoji(message$1) {
     expects: null,
     requirement: EMOJI_REGEX,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !this.requirement.test(dataset.value)) _addIssue(this, "emoji", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/empty/empty.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function empty(message$1) {
   return {
     kind: "validation",
@@ -70003,18 +70636,21 @@ function empty(message$1) {
     async: false,
     expects: "0",
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && dataset.value.length > 0) _addIssue(this, "length", dataset, config$1, {
         received: `${dataset.value.length}`
       });
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/endsWith/endsWith.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function endsWith(requirement, message$1) {
   return {
     kind: "validation",
@@ -70024,18 +70660,21 @@ function endsWith(requirement, message$1) {
     expects: `"${requirement}"`,
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !dataset.value.endsWith(this.requirement)) _addIssue(this, "end", dataset, config$1, {
         received: `"${dataset.value.slice(-this.requirement.length)}"`
       });
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/entries/entries.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function entries(requirement, message$1) {
   return {
     kind: "validation",
@@ -70045,6 +70684,7 @@ function entries(requirement, message$1) {
     expects: `${requirement}`,
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (!dataset.typed) return dataset;
       const count = Object.keys(dataset.value).length;
@@ -70053,12 +70693,14 @@ function entries(requirement, message$1) {
       });
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/everyItem/everyItem.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function everyItem(requirement, message$1) {
   return {
     kind: "validation",
@@ -70068,15 +70710,16 @@ function everyItem(requirement, message$1) {
     expects: null,
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !dataset.value.every(this.requirement)) _addIssue(this, "item", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/examples/examples.ts
+
 /**
 * Creates an examples metadata action.
 *
@@ -70086,7 +70729,10 @@ function everyItem(requirement, message$1) {
 *
 * @beta
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function examples(examples_) {
   return {
     kind: "metadata",
@@ -70094,13 +70740,15 @@ function examples(examples_) {
     reference: examples,
     examples: examples_
   };
-}
-
-//#endregion
+} //#endregion
 //#region src/actions/excludes/excludes.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function excludes(requirement, message$1) {
   const received = /* @__PURE__ */_stringify(requirement);
+
   return {
     kind: "validation",
     type: "excludes",
@@ -70109,18 +70757,21 @@ function excludes(requirement, message$1) {
     expects: `!${received}`,
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && dataset.value.includes(this.requirement)) _addIssue(this, "content", dataset, config$1, {
         received
       });
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/filterItems/filterItems.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function filterItems(operation) {
   return {
     kind: "transformation",
@@ -70128,16 +70779,19 @@ function filterItems(operation) {
     reference: filterItems,
     async: false,
     operation,
+
     "~run"(dataset) {
       dataset.value = dataset.value.filter(this.operation);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/findItem/findItem.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function findItem(operation) {
   return {
     kind: "transformation",
@@ -70145,16 +70799,19 @@ function findItem(operation) {
     reference: findItem,
     async: false,
     operation,
+
     "~run"(dataset) {
       dataset.value = dataset.value.find(this.operation);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/finite/finite.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function finite(message$1) {
   return {
     kind: "validation",
@@ -70164,15 +70821,16 @@ function finite(message$1) {
     expects: null,
     requirement: Number.isFinite,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !this.requirement(dataset.value)) _addIssue(this, "finite", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/flavor/flavor.ts
+
 /**
 * Creates a flavor transformation action.
 *
@@ -70182,7 +70840,10 @@ function finite(message$1) {
 *
 * @beta
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function flavor(name) {
   return {
     kind: "transformation",
@@ -70190,15 +70851,18 @@ function flavor(name) {
     reference: flavor,
     async: false,
     name,
+
     "~run"(dataset) {
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/graphemes/graphemes.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function graphemes(requirement, message$1) {
   return {
     kind: "validation",
@@ -70208,21 +70872,26 @@ function graphemes(requirement, message$1) {
     expects: `${requirement}`,
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed) {
         const count = /* @__PURE__ */_getGraphemeCount(dataset.value);
+
         if (count !== this.requirement) _addIssue(this, "graphemes", dataset, config$1, {
           received: `${count}`
         });
       }
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/gtValue/gtValue.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function gtValue(requirement, message$1) {
   return {
     kind: "validation",
@@ -70232,20 +70901,23 @@ function gtValue(requirement, message$1) {
     expects: `>${requirement instanceof Date ? requirement.toJSON() : /* @__PURE__ */_stringify(requirement)}`,
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !(dataset.value > this.requirement)) _addIssue(this, "value", dataset, config$1, {
         received: dataset.value instanceof Date ? dataset.value.toJSON() : /* @__PURE__ */_stringify(dataset.value)
       });
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/hash/hash.ts
+
 /**
 * Hash lengths object.
 */
+
+
 const HASH_LENGTHS = {
   md4: 32,
   md5: 32,
@@ -70263,6 +70935,7 @@ const HASH_LENGTHS = {
   adler32: 8
 };
 /* @__NO_SIDE_EFFECTS__ */
+
 function hash(types, message$1) {
   return {
     kind: "validation",
@@ -70272,16 +70945,19 @@ function hash(types, message$1) {
     async: false,
     requirement: RegExp(types.map(type => `^[a-f0-9]{${HASH_LENGTHS[type]}}$`).join("|"), "iu"),
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !this.requirement.test(dataset.value)) _addIssue(this, "hash", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/hexadecimal/hexadecimal.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function hexadecimal(message$1) {
   return {
     kind: "validation",
@@ -70291,16 +70967,19 @@ function hexadecimal(message$1) {
     expects: null,
     requirement: HEXADECIMAL_REGEX,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !this.requirement.test(dataset.value)) _addIssue(this, "hexadecimal", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/hexColor/hexColor.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function hexColor(message$1) {
   return {
     kind: "validation",
@@ -70310,16 +70989,19 @@ function hexColor(message$1) {
     expects: null,
     requirement: HEX_COLOR_REGEX,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !this.requirement.test(dataset.value)) _addIssue(this, "hex color", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/imei/imei.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function imei(message$1) {
   return {
     kind: "validation",
@@ -70327,22 +71009,28 @@ function imei(message$1) {
     reference: imei,
     async: false,
     expects: null,
+
     requirement(input) {
       return IMEI_REGEX.test(input) && /* @__PURE__ */_isLuhnAlgo(input);
     },
+
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !this.requirement(dataset.value)) _addIssue(this, "IMEI", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/includes/includes.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function includes(requirement, message$1) {
   const expects = /* @__PURE__ */_stringify(requirement);
+
   return {
     kind: "validation",
     type: "includes",
@@ -70351,18 +71039,21 @@ function includes(requirement, message$1) {
     expects,
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !dataset.value.includes(this.requirement)) _addIssue(this, "content", dataset, config$1, {
         received: `!${expects}`
       });
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/integer/integer.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function integer(message$1) {
   return {
     kind: "validation",
@@ -70372,16 +71063,19 @@ function integer(message$1) {
     expects: null,
     requirement: Number.isInteger,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !this.requirement(dataset.value)) _addIssue(this, "integer", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/ip/ip.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function ip(message$1) {
   return {
     kind: "validation",
@@ -70391,16 +71085,19 @@ function ip(message$1) {
     expects: null,
     requirement: IP_REGEX,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !this.requirement.test(dataset.value)) _addIssue(this, "IP", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/ipv4/ipv4.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function ipv4(message$1) {
   return {
     kind: "validation",
@@ -70410,16 +71107,19 @@ function ipv4(message$1) {
     expects: null,
     requirement: IPV4_REGEX,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !this.requirement.test(dataset.value)) _addIssue(this, "IPv4", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/ipv6/ipv6.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function ipv6(message$1) {
   return {
     kind: "validation",
@@ -70429,16 +71129,19 @@ function ipv6(message$1) {
     expects: null,
     requirement: IPV6_REGEX,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !this.requirement.test(dataset.value)) _addIssue(this, "IPv6", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/isoDate/isoDate.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function isoDate(message$1) {
   return {
     kind: "validation",
@@ -70448,16 +71151,19 @@ function isoDate(message$1) {
     expects: null,
     requirement: ISO_DATE_REGEX,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !this.requirement.test(dataset.value)) _addIssue(this, "date", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/isoDateTime/isoDateTime.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function isoDateTime(message$1) {
   return {
     kind: "validation",
@@ -70467,16 +71173,19 @@ function isoDateTime(message$1) {
     expects: null,
     requirement: ISO_DATE_TIME_REGEX,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !this.requirement.test(dataset.value)) _addIssue(this, "date-time", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/isoTime/isoTime.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function isoTime(message$1) {
   return {
     kind: "validation",
@@ -70486,16 +71195,19 @@ function isoTime(message$1) {
     expects: null,
     requirement: ISO_TIME_REGEX,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !this.requirement.test(dataset.value)) _addIssue(this, "time", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/isoTimeSecond/isoTimeSecond.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function isoTimeSecond(message$1) {
   return {
     kind: "validation",
@@ -70505,16 +71217,19 @@ function isoTimeSecond(message$1) {
     expects: null,
     requirement: ISO_TIME_SECOND_REGEX,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !this.requirement.test(dataset.value)) _addIssue(this, "time-second", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/isoTimestamp/isoTimestamp.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function isoTimestamp(message$1) {
   return {
     kind: "validation",
@@ -70524,16 +71239,19 @@ function isoTimestamp(message$1) {
     expects: null,
     requirement: ISO_TIMESTAMP_REGEX,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !this.requirement.test(dataset.value)) _addIssue(this, "timestamp", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/isoWeek/isoWeek.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function isoWeek(message$1) {
   return {
     kind: "validation",
@@ -70543,16 +71261,19 @@ function isoWeek(message$1) {
     expects: null,
     requirement: ISO_WEEK_REGEX,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !this.requirement.test(dataset.value)) _addIssue(this, "week", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/length/length.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function length(requirement, message$1) {
   return {
     kind: "validation",
@@ -70562,18 +71283,21 @@ function length(requirement, message$1) {
     expects: `${requirement}`,
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && dataset.value.length !== this.requirement) _addIssue(this, "length", dataset, config$1, {
         received: `${dataset.value.length}`
       });
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/ltValue/ltValue.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function ltValue(requirement, message$1) {
   return {
     kind: "validation",
@@ -70583,18 +71307,21 @@ function ltValue(requirement, message$1) {
     expects: `<${requirement instanceof Date ? requirement.toJSON() : /* @__PURE__ */_stringify(requirement)}`,
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !(dataset.value < this.requirement)) _addIssue(this, "value", dataset, config$1, {
         received: dataset.value instanceof Date ? dataset.value.toJSON() : /* @__PURE__ */_stringify(dataset.value)
       });
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/mac/mac.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function mac(message$1) {
   return {
     kind: "validation",
@@ -70604,16 +71331,19 @@ function mac(message$1) {
     expects: null,
     requirement: MAC_REGEX,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !this.requirement.test(dataset.value)) _addIssue(this, "MAC", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/mac48/mac48.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function mac48(message$1) {
   return {
     kind: "validation",
@@ -70623,16 +71353,19 @@ function mac48(message$1) {
     expects: null,
     requirement: MAC48_REGEX,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !this.requirement.test(dataset.value)) _addIssue(this, "48-bit MAC", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/mac64/mac64.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function mac64(message$1) {
   return {
     kind: "validation",
@@ -70642,16 +71375,19 @@ function mac64(message$1) {
     expects: null,
     requirement: MAC64_REGEX,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !this.requirement.test(dataset.value)) _addIssue(this, "64-bit MAC", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/mapItems/mapItems.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function mapItems(operation) {
   return {
     kind: "transformation",
@@ -70659,16 +71395,19 @@ function mapItems(operation) {
     reference: mapItems,
     async: false,
     operation,
+
     "~run"(dataset) {
       dataset.value = dataset.value.map(this.operation);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/maxBytes/maxBytes.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function maxBytes(requirement, message$1) {
   return {
     kind: "validation",
@@ -70678,21 +71417,26 @@ function maxBytes(requirement, message$1) {
     expects: `<=${requirement}`,
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed) {
         const length$1 = /* @__PURE__ */_getByteCount(dataset.value);
+
         if (length$1 > this.requirement) _addIssue(this, "bytes", dataset, config$1, {
           received: `${length$1}`
         });
       }
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/maxEntries/maxEntries.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function maxEntries(requirement, message$1) {
   return {
     kind: "validation",
@@ -70702,6 +71446,7 @@ function maxEntries(requirement, message$1) {
     expects: `<=${requirement}`,
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (!dataset.typed) return dataset;
       const count = Object.keys(dataset.value).length;
@@ -70710,12 +71455,14 @@ function maxEntries(requirement, message$1) {
       });
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/maxGraphemes/maxGraphemes.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function maxGraphemes(requirement, message$1) {
   return {
     kind: "validation",
@@ -70725,21 +71472,26 @@ function maxGraphemes(requirement, message$1) {
     expects: `<=${requirement}`,
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed) {
         const count = /* @__PURE__ */_getGraphemeCount(dataset.value);
+
         if (count > this.requirement) _addIssue(this, "graphemes", dataset, config$1, {
           received: `${count}`
         });
       }
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/maxLength/maxLength.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function maxLength(requirement, message$1) {
   return {
     kind: "validation",
@@ -70749,18 +71501,21 @@ function maxLength(requirement, message$1) {
     expects: `<=${requirement}`,
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && dataset.value.length > this.requirement) _addIssue(this, "length", dataset, config$1, {
         received: `${dataset.value.length}`
       });
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/maxSize/maxSize.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function maxSize(requirement, message$1) {
   return {
     kind: "validation",
@@ -70770,18 +71525,21 @@ function maxSize(requirement, message$1) {
     expects: `<=${requirement}`,
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && dataset.value.size > this.requirement) _addIssue(this, "size", dataset, config$1, {
         received: `${dataset.value.size}`
       });
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/maxValue/maxValue.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function maxValue(requirement, message$1) {
   return {
     kind: "validation",
@@ -70791,18 +71549,21 @@ function maxValue(requirement, message$1) {
     expects: `<=${requirement instanceof Date ? requirement.toJSON() : /* @__PURE__ */_stringify(requirement)}`,
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !(dataset.value <= this.requirement)) _addIssue(this, "value", dataset, config$1, {
         received: dataset.value instanceof Date ? dataset.value.toJSON() : /* @__PURE__ */_stringify(dataset.value)
       });
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/maxWords/maxWords.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function maxWords(locales, requirement, message$1) {
   return {
     kind: "validation",
@@ -70813,20 +71574,23 @@ function maxWords(locales, requirement, message$1) {
     locales,
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed) {
         const count = /* @__PURE__ */_getWordCount(this.locales, dataset.value);
+
         if (count > this.requirement) _addIssue(this, "words", dataset, config$1, {
           received: `${count}`
         });
       }
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/metadata/metadata.ts
+
 /**
 * Creates a custom metadata action.
 *
@@ -70834,7 +71598,10 @@ function maxWords(locales, requirement, message$1) {
 *
 * @returns A metadata action.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function metadata(metadata_) {
   return {
     kind: "metadata",
@@ -70842,11 +71609,12 @@ function metadata(metadata_) {
     reference: metadata,
     metadata: metadata_
   };
-}
-
-//#endregion
+} //#endregion
 //#region src/actions/mimeType/mimeType.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function mimeType(requirement, message$1) {
   return {
     kind: "validation",
@@ -70856,18 +71624,21 @@ function mimeType(requirement, message$1) {
     expects: /* @__PURE__ */_joinExpects(requirement.map(option => `"${option}"`), "|"),
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !this.requirement.includes(dataset.value.type)) _addIssue(this, "MIME type", dataset, config$1, {
         received: `"${dataset.value.type}"`
       });
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/minBytes/minBytes.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function minBytes(requirement, message$1) {
   return {
     kind: "validation",
@@ -70877,21 +71648,26 @@ function minBytes(requirement, message$1) {
     expects: `>=${requirement}`,
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed) {
         const length$1 = /* @__PURE__ */_getByteCount(dataset.value);
+
         if (length$1 < this.requirement) _addIssue(this, "bytes", dataset, config$1, {
           received: `${length$1}`
         });
       }
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/minEntries/minEntries.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function minEntries(requirement, message$1) {
   return {
     kind: "validation",
@@ -70901,6 +71677,7 @@ function minEntries(requirement, message$1) {
     expects: `>=${requirement}`,
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (!dataset.typed) return dataset;
       const count = Object.keys(dataset.value).length;
@@ -70909,12 +71686,14 @@ function minEntries(requirement, message$1) {
       });
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/minGraphemes/minGraphemes.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function minGraphemes(requirement, message$1) {
   return {
     kind: "validation",
@@ -70924,21 +71703,26 @@ function minGraphemes(requirement, message$1) {
     expects: `>=${requirement}`,
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed) {
         const count = /* @__PURE__ */_getGraphemeCount(dataset.value);
+
         if (count < this.requirement) _addIssue(this, "graphemes", dataset, config$1, {
           received: `${count}`
         });
       }
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/minLength/minLength.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function minLength(requirement, message$1) {
   return {
     kind: "validation",
@@ -70948,18 +71732,21 @@ function minLength(requirement, message$1) {
     expects: `>=${requirement}`,
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && dataset.value.length < this.requirement) _addIssue(this, "length", dataset, config$1, {
         received: `${dataset.value.length}`
       });
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/minSize/minSize.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function minSize(requirement, message$1) {
   return {
     kind: "validation",
@@ -70969,18 +71756,21 @@ function minSize(requirement, message$1) {
     expects: `>=${requirement}`,
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && dataset.value.size < this.requirement) _addIssue(this, "size", dataset, config$1, {
         received: `${dataset.value.size}`
       });
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/minValue/minValue.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function minValue(requirement, message$1) {
   return {
     kind: "validation",
@@ -70990,18 +71780,21 @@ function minValue(requirement, message$1) {
     expects: `>=${requirement instanceof Date ? requirement.toJSON() : /* @__PURE__ */_stringify(requirement)}`,
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !(dataset.value >= this.requirement)) _addIssue(this, "value", dataset, config$1, {
         received: dataset.value instanceof Date ? dataset.value.toJSON() : /* @__PURE__ */_stringify(dataset.value)
       });
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/minWords/minWords.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function minWords(locales, requirement, message$1) {
   return {
     kind: "validation",
@@ -71012,21 +71805,26 @@ function minWords(locales, requirement, message$1) {
     locales,
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed) {
         const count = /* @__PURE__ */_getWordCount(this.locales, dataset.value);
+
         if (count < this.requirement) _addIssue(this, "words", dataset, config$1, {
           received: `${count}`
         });
       }
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/multipleOf/multipleOf.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function multipleOf(requirement, message$1) {
   return {
     kind: "validation",
@@ -71036,16 +71834,19 @@ function multipleOf(requirement, message$1) {
     expects: `%${requirement}`,
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && dataset.value % this.requirement != 0) _addIssue(this, "multiple", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/nanoid/nanoid.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function nanoid(message$1) {
   return {
     kind: "validation",
@@ -71055,16 +71856,19 @@ function nanoid(message$1) {
     expects: null,
     requirement: NANO_ID_REGEX,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !this.requirement.test(dataset.value)) _addIssue(this, "Nano ID", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/nonEmpty/nonEmpty.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function nonEmpty(message$1) {
   return {
     kind: "validation",
@@ -71073,18 +71877,21 @@ function nonEmpty(message$1) {
     async: false,
     expects: "!0",
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && dataset.value.length === 0) _addIssue(this, "length", dataset, config$1, {
         received: "0"
       });
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/normalize/normalize.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function normalize(form) {
   return {
     kind: "transformation",
@@ -71092,16 +71899,19 @@ function normalize(form) {
     reference: normalize,
     async: false,
     form,
+
     "~run"(dataset) {
       dataset.value = dataset.value.normalize(this.form);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/notBytes/notBytes.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function notBytes(requirement, message$1) {
   return {
     kind: "validation",
@@ -71111,21 +71921,26 @@ function notBytes(requirement, message$1) {
     expects: `!${requirement}`,
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed) {
         const length$1 = /* @__PURE__ */_getByteCount(dataset.value);
+
         if (length$1 === this.requirement) _addIssue(this, "bytes", dataset, config$1, {
           received: `${length$1}`
         });
       }
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/notEntries/notEntries.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function notEntries(requirement, message$1) {
   return {
     kind: "validation",
@@ -71135,6 +71950,7 @@ function notEntries(requirement, message$1) {
     expects: `!${requirement}`,
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (!dataset.typed) return dataset;
       const count = Object.keys(dataset.value).length;
@@ -71143,12 +71959,14 @@ function notEntries(requirement, message$1) {
       });
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/notGraphemes/notGraphemes.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function notGraphemes(requirement, message$1) {
   return {
     kind: "validation",
@@ -71158,21 +71976,26 @@ function notGraphemes(requirement, message$1) {
     expects: `!${requirement}`,
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed) {
         const count = /* @__PURE__ */_getGraphemeCount(dataset.value);
+
         if (count === this.requirement) _addIssue(this, "graphemes", dataset, config$1, {
           received: `${count}`
         });
       }
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/notLength/notLength.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function notLength(requirement, message$1) {
   return {
     kind: "validation",
@@ -71182,18 +72005,21 @@ function notLength(requirement, message$1) {
     expects: `!${requirement}`,
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && dataset.value.length === this.requirement) _addIssue(this, "length", dataset, config$1, {
         received: `${dataset.value.length}`
       });
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/notSize/notSize.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function notSize(requirement, message$1) {
   return {
     kind: "validation",
@@ -71203,60 +72029,73 @@ function notSize(requirement, message$1) {
     expects: `!${requirement}`,
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && dataset.value.size === this.requirement) _addIssue(this, "size", dataset, config$1, {
         received: `${dataset.value.size}`
       });
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/notValue/notValue.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function notValue(requirement, message$1) {
   return {
     kind: "validation",
     type: "not_value",
     reference: notValue,
     async: false,
-    expects: requirement instanceof Date ? `!${requirement.toJSON()}` : `!${ /* @__PURE__ */_stringify(requirement)}`,
+    expects: requirement instanceof Date ? `!${requirement.toJSON()}` : `!${
+    /* @__PURE__ */
+    _stringify(requirement)}`,
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && this.requirement <= dataset.value && this.requirement >= dataset.value) _addIssue(this, "value", dataset, config$1, {
         received: dataset.value instanceof Date ? dataset.value.toJSON() : /* @__PURE__ */_stringify(dataset.value)
       });
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/notValues/notValues.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function notValues(requirement, message$1) {
   return {
     kind: "validation",
     type: "not_values",
     reference: notValues,
     async: false,
-    expects: `!${ /* @__PURE__ */_joinExpects(requirement.map(value$1 => value$1 instanceof Date ? value$1.toJSON() : /* @__PURE__ */_stringify(value$1)), "|")}`,
+    expects: `!${
+    /* @__PURE__ */
+    _joinExpects(requirement.map(value$1 => value$1 instanceof Date ? value$1.toJSON() : /* @__PURE__ */_stringify(value$1)), "|")}`,
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && this.requirement.some(value$1 => value$1 <= dataset.value && value$1 >= dataset.value)) _addIssue(this, "value", dataset, config$1, {
         received: dataset.value instanceof Date ? dataset.value.toJSON() : /* @__PURE__ */_stringify(dataset.value)
       });
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/notWords/notWords.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function notWords(locales, requirement, message$1) {
   return {
     kind: "validation",
@@ -71267,21 +72106,26 @@ function notWords(locales, requirement, message$1) {
     locales,
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed) {
         const count = /* @__PURE__ */_getWordCount(this.locales, dataset.value);
+
         if (count === this.requirement) _addIssue(this, "words", dataset, config$1, {
           received: `${count}`
         });
       }
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/octal/octal.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function octal(message$1) {
   return {
     kind: "validation",
@@ -71291,16 +72135,19 @@ function octal(message$1) {
     expects: null,
     requirement: OCTAL_REGEX,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !this.requirement.test(dataset.value)) _addIssue(this, "octal", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/parseJson/parseJson.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function parseJson(config$1, message$1) {
   return {
     kind: "transformation",
@@ -71309,6 +72156,7 @@ function parseJson(config$1, message$1) {
     config: config$1,
     message: message$1,
     async: false,
+
     "~run"(dataset, config$2) {
       try {
         dataset.value = JSON.parse(dataset.value, this.config?.reviver);
@@ -71317,16 +72165,18 @@ function parseJson(config$1, message$1) {
           _addIssue(this, "JSON", dataset, config$2, {
             received: `"${error.message}"`
           });
+
           dataset.typed = false;
         } else throw error;
       }
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/partialCheck/utils/_isPartiallyTyped/_isPartiallyTyped.ts
+
 /**
 * Checks if a dataset is partially typed.
 *
@@ -71337,23 +72187,29 @@ function parseJson(config$1, message$1) {
 *
 * @internal
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function _isPartiallyTyped(dataset, paths) {
   if (dataset.issues) for (const path of paths) for (const issue of dataset.issues) {
     let typed = false;
     const bound = Math.min(path.length, issue.path?.length ?? 0);
+
     for (let index = 0; index < bound; index++) if (path[index] !== issue.path[index].key && (path[index] !== "$" || issue.path[index].type !== "array")) {
       typed = true;
       break;
     }
+
     if (!typed) return false;
   }
   return true;
-}
-
-//#endregion
+} //#endregion
 //#region src/actions/partialCheck/partialCheck.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function partialCheck(paths, requirement, message$1) {
   return {
     kind: "validation",
@@ -71364,16 +72220,19 @@ function partialCheck(paths, requirement, message$1) {
     paths,
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if ((dataset.typed || /* @__PURE__ */_isPartiallyTyped(dataset, paths)) && !this.requirement(dataset.value)) _addIssue(this, "input", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/partialCheck/partialCheckAsync.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function partialCheckAsync(paths, requirement, message$1) {
   return {
     kind: "validation",
@@ -71384,15 +72243,16 @@ function partialCheckAsync(paths, requirement, message$1) {
     paths,
     requirement,
     message: message$1,
+
     async "~run"(dataset, config$1) {
       if ((dataset.typed || /* @__PURE__ */_isPartiallyTyped(dataset, paths)) && !(await this.requirement(dataset.value))) _addIssue(this, "input", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/rawCheck/rawCheck.ts
+
 /**
 * Creates a raw check validation action.
 *
@@ -71400,7 +72260,10 @@ function partialCheckAsync(paths, requirement, message$1) {
 *
 * @returns A raw check action.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function rawCheck(action) {
   return {
     kind: "validation",
@@ -71408,6 +72271,7 @@ function rawCheck(action) {
     reference: rawCheck,
     async: false,
     expects: null,
+
     "~run"(dataset, config$1) {
       action({
         dataset,
@@ -71416,11 +72280,11 @@ function rawCheck(action) {
       });
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/rawCheck/rawCheckAsync.ts
+
 /**
 * Creates a raw check validation action.
 *
@@ -71428,7 +72292,10 @@ function rawCheck(action) {
 *
 * @returns A raw check action.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function rawCheckAsync(action) {
   return {
     kind: "validation",
@@ -71436,6 +72303,7 @@ function rawCheckAsync(action) {
     reference: rawCheckAsync,
     async: true,
     expects: null,
+
     async "~run"(dataset, config$1) {
       await action({
         dataset,
@@ -71444,11 +72312,11 @@ function rawCheckAsync(action) {
       });
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/rawTransform/rawTransform.ts
+
 /**
 * Creates a raw transformation action.
 *
@@ -71456,13 +72324,17 @@ function rawCheckAsync(action) {
 *
 * @returns A raw transform action.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function rawTransform(action) {
   return {
     kind: "transformation",
     type: "raw_transform",
     reference: rawTransform,
     async: false,
+
     "~run"(dataset, config$1) {
       const output = action({
         dataset,
@@ -71473,11 +72345,11 @@ function rawTransform(action) {
       if (dataset.issues) dataset.typed = false;else dataset.value = output;
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/rawTransform/rawTransformAsync.ts
+
 /**
 * Creates a raw transformation action.
 *
@@ -71485,13 +72357,17 @@ function rawTransform(action) {
 *
 * @returns A raw transform action.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function rawTransformAsync(action) {
   return {
     kind: "transformation",
     type: "raw_transform",
     reference: rawTransformAsync,
     async: true,
+
     async "~run"(dataset, config$1) {
       const output = await action({
         dataset,
@@ -71502,27 +72378,32 @@ function rawTransformAsync(action) {
       if (dataset.issues) dataset.typed = false;else dataset.value = output;
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/readonly/readonly.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function readonly() {
   return {
     kind: "transformation",
     type: "readonly",
     reference: readonly,
     async: false,
+
     "~run"(dataset) {
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/reduceItems/reduceItems.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function reduceItems(operation, initial) {
   return {
     kind: "transformation",
@@ -71531,16 +72412,19 @@ function reduceItems(operation, initial) {
     async: false,
     operation,
     initial,
+
     "~run"(dataset) {
       dataset.value = dataset.value.reduce(this.operation, this.initial);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/regex/regex.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function regex(requirement, message$1) {
   return {
     kind: "validation",
@@ -71550,16 +72434,19 @@ function regex(requirement, message$1) {
     expects: `${requirement}`,
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !this.requirement.test(dataset.value)) _addIssue(this, "format", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/returns/returns.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function returns(schema) {
   return {
     kind: "transformation",
@@ -71567,8 +72454,10 @@ function returns(schema) {
     reference: returns,
     async: false,
     schema,
+
     "~run"(dataset, config$1) {
       const func = dataset.value;
+
       dataset.value = (...args_) => {
         const returnsDataset = this.schema["~run"]({
           value: func(...args_)
@@ -71576,14 +72465,17 @@ function returns(schema) {
         if (returnsDataset.issues) throw new ValiError(returnsDataset.issues);
         return returnsDataset.value;
       };
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/returns/returnsAsync.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function returnsAsync(schema) {
   return {
     kind: "transformation",
@@ -71591,8 +72483,10 @@ function returnsAsync(schema) {
     reference: returnsAsync,
     async: false,
     schema,
+
     "~run"(dataset, config$1) {
       const func = dataset.value;
+
       dataset.value = async (...args_) => {
         const returnsDataset = await this.schema["~run"]({
           value: await func(...args_)
@@ -71600,14 +72494,17 @@ function returnsAsync(schema) {
         if (returnsDataset.issues) throw new ValiError(returnsDataset.issues);
         return returnsDataset.value;
       };
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/rfcEmail/rfcEmail.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function rfcEmail(message$1) {
   return {
     kind: "validation",
@@ -71617,16 +72514,19 @@ function rfcEmail(message$1) {
     async: false,
     requirement: RFC_EMAIL_REGEX,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !this.requirement.test(dataset.value)) _addIssue(this, "email", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/safeInteger/safeInteger.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function safeInteger(message$1) {
   return {
     kind: "validation",
@@ -71636,16 +72536,19 @@ function safeInteger(message$1) {
     expects: null,
     requirement: Number.isSafeInteger,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !this.requirement(dataset.value)) _addIssue(this, "safe integer", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/size/size.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function size(requirement, message$1) {
   return {
     kind: "validation",
@@ -71655,18 +72558,21 @@ function size(requirement, message$1) {
     expects: `${requirement}`,
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && dataset.value.size !== this.requirement) _addIssue(this, "size", dataset, config$1, {
         received: `${dataset.value.size}`
       });
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/slug/slug.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function slug(message$1) {
   return {
     kind: "validation",
@@ -71676,16 +72582,19 @@ function slug(message$1) {
     expects: null,
     requirement: SLUG_REGEX,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !this.requirement.test(dataset.value)) _addIssue(this, "slug", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/someItem/someItem.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function someItem(requirement, message$1) {
   return {
     kind: "validation",
@@ -71695,16 +72604,19 @@ function someItem(requirement, message$1) {
     expects: null,
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !dataset.value.some(this.requirement)) _addIssue(this, "item", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/sortItems/sortItems.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function sortItems(operation) {
   return {
     kind: "transformation",
@@ -71712,16 +72624,19 @@ function sortItems(operation) {
     reference: sortItems,
     async: false,
     operation,
+
     "~run"(dataset) {
       dataset.value = dataset.value.sort(this.operation);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/startsWith/startsWith.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function startsWith(requirement, message$1) {
   return {
     kind: "validation",
@@ -71731,18 +72646,21 @@ function startsWith(requirement, message$1) {
     expects: `"${requirement}"`,
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !dataset.value.startsWith(this.requirement)) _addIssue(this, "start", dataset, config$1, {
         received: `"${dataset.value.slice(0, this.requirement.length)}"`
       });
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/stringifyJson/stringifyJson.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function stringifyJson(config$1, message$1) {
   return {
     kind: "transformation",
@@ -71751,29 +72669,35 @@ function stringifyJson(config$1, message$1) {
     message: message$1,
     config: config$1,
     async: false,
+
     "~run"(dataset, config$2) {
       try {
         const output = JSON.stringify(dataset.value, this.config?.replacer, this.config?.space);
+
         if (output === void 0) {
           _addIssue(this, "JSON", dataset, config$2);
+
           dataset.typed = false;
         }
+
         dataset.value = output;
       } catch (error) {
         if (error instanceof Error) {
           _addIssue(this, "JSON", dataset, config$2, {
             received: `"${error.message}"`
           });
+
           dataset.typed = false;
         } else throw error;
       }
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/title/title.ts
+
 /**
 * Creates a title metadata action.
 *
@@ -71781,7 +72705,10 @@ function stringifyJson(config$1, message$1) {
 *
 * @returns A title action.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function title(title_) {
   return {
     kind: "metadata",
@@ -71789,11 +72716,12 @@ function title(title_) {
     reference: title,
     title: title_
   };
-}
-
-//#endregion
+} //#endregion
 //#region src/actions/toBigint/toBigint.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function toBigint(message$1) {
   return {
     kind: "transformation",
@@ -71801,20 +72729,23 @@ function toBigint(message$1) {
     reference: toBigint,
     async: false,
     message: message$1,
+
     "~run"(dataset, config$1) {
       try {
         dataset.value = BigInt(dataset.value);
       } catch {
         _addIssue(this, "bigint", dataset, config$1);
+
         dataset.typed = false;
       }
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/toBoolean/toBoolean.ts
+
 /**
 * Creates a to boolean transformation action.
 *
@@ -71822,23 +72753,29 @@ function toBigint(message$1) {
 *
 * @beta
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function toBoolean() {
   return {
     kind: "transformation",
     type: "to_boolean",
     reference: toBoolean,
     async: false,
+
     "~run"(dataset) {
       dataset.value = Boolean(dataset.value);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/toDate/toDate.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function toDate(message$1) {
   return {
     kind: "transformation",
@@ -71846,47 +72783,56 @@ function toDate(message$1) {
     reference: toDate,
     async: false,
     message: message$1,
+
     "~run"(dataset, config$1) {
       try {
         dataset.value = new Date(dataset.value);
+
         if (isNaN(dataset.value)) {
           _addIssue(this, "date", dataset, config$1, {
             received: "\"Invalid Date\""
           });
+
           dataset.typed = false;
         }
       } catch {
         _addIssue(this, "date", dataset, config$1);
+
         dataset.typed = false;
       }
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/toLowerCase/toLowerCase.ts
+
 /**
 * Creates a to lower case transformation action.
 *
 * @returns A to lower case action.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function toLowerCase() {
   return {
     kind: "transformation",
     type: "to_lower_case",
     reference: toLowerCase,
     async: false,
+
     "~run"(dataset) {
       dataset.value = dataset.value.toLowerCase();
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/toMaxValue/toMaxValue.ts
+
 /**
 * Creates a to max value transformation action.
 *
@@ -71894,7 +72840,10 @@ function toLowerCase() {
 *
 * @returns A to max value action.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function toMaxValue(requirement) {
   return {
     kind: "transformation",
@@ -71902,15 +72851,16 @@ function toMaxValue(requirement) {
     reference: toMaxValue,
     async: false,
     requirement,
+
     "~run"(dataset) {
       dataset.value = dataset.value > this.requirement ? this.requirement : dataset.value;
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/toMinValue/toMinValue.ts
+
 /**
 * Creates a to min value transformation action.
 *
@@ -71918,7 +72868,10 @@ function toMaxValue(requirement) {
 *
 * @returns A to min value action.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function toMinValue(requirement) {
   return {
     kind: "transformation",
@@ -71926,16 +72879,19 @@ function toMinValue(requirement) {
     reference: toMinValue,
     async: false,
     requirement,
+
     "~run"(dataset) {
       dataset.value = dataset.value < this.requirement ? this.requirement : dataset.value;
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/toNumber/toNumber.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function toNumber(message$1) {
   return {
     kind: "transformation",
@@ -71943,25 +72899,32 @@ function toNumber(message$1) {
     reference: toNumber,
     async: false,
     message: message$1,
+
     "~run"(dataset, config$1) {
       try {
         dataset.value = Number(dataset.value);
+
         if (isNaN(dataset.value)) {
           _addIssue(this, "number", dataset, config$1);
+
           dataset.typed = false;
         }
       } catch {
         _addIssue(this, "number", dataset, config$1);
+
         dataset.typed = false;
       }
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/toString/toString.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function toString(message$1) {
   return {
     kind: "transformation",
@@ -71969,41 +72932,48 @@ function toString(message$1) {
     reference: toString,
     async: false,
     message: message$1,
+
     "~run"(dataset, config$1) {
       try {
         dataset.value = String(dataset.value);
       } catch {
         _addIssue(this, "string", dataset, config$1);
+
         dataset.typed = false;
       }
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/toUpperCase/toUpperCase.ts
+
 /**
 * Creates a to upper case transformation action.
 *
 * @returns A to upper case action.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function toUpperCase() {
   return {
     kind: "transformation",
     type: "to_upper_case",
     reference: toUpperCase,
     async: false,
+
     "~run"(dataset) {
       dataset.value = dataset.value.toUpperCase();
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/transform/transform.ts
+
 /**
 * Creates a custom transformation action.
 *
@@ -72011,7 +72981,10 @@ function toUpperCase() {
 *
 * @returns A transform action.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function transform(operation) {
   return {
     kind: "transformation",
@@ -72019,15 +72992,16 @@ function transform(operation) {
     reference: transform,
     async: false,
     operation,
+
     "~run"(dataset) {
       dataset.value = this.operation(dataset.value);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/transform/transformAsync.ts
+
 /**
 * Creates a custom transformation action.
 *
@@ -72035,7 +73009,10 @@ function transform(operation) {
 *
 * @returns A transform action.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function transformAsync(operation) {
   return {
     kind: "transformation",
@@ -72043,79 +73020,94 @@ function transformAsync(operation) {
     reference: transformAsync,
     async: true,
     operation,
+
     async "~run"(dataset) {
       dataset.value = await this.operation(dataset.value);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/trim/trim.ts
+
 /**
 * Creates a trim transformation action.
 *
 * @returns A trim action.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function trim() {
   return {
     kind: "transformation",
     type: "trim",
     reference: trim,
     async: false,
+
     "~run"(dataset) {
       dataset.value = dataset.value.trim();
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/trimEnd/trimEnd.ts
+
 /**
 * Creates a trim end transformation action.
 *
 * @returns A trim end action.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function trimEnd() {
   return {
     kind: "transformation",
     type: "trim_end",
     reference: trimEnd,
     async: false,
+
     "~run"(dataset) {
       dataset.value = dataset.value.trimEnd();
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/trimStart/trimStart.ts
+
 /**
 * Creates a trim start transformation action.
 *
 * @returns A trim start action.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function trimStart() {
   return {
     kind: "transformation",
     type: "trim_start",
     reference: trimStart,
     async: false,
+
     "~run"(dataset) {
       dataset.value = dataset.value.trimStart();
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/ulid/ulid.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function ulid(message$1) {
   return {
     kind: "validation",
@@ -72125,16 +73117,19 @@ function ulid(message$1) {
     expects: null,
     requirement: ULID_REGEX,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !this.requirement.test(dataset.value)) _addIssue(this, "ULID", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/url/url.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function url(message$1) {
   return {
     kind: "validation",
@@ -72142,6 +73137,7 @@ function url(message$1) {
     reference: url,
     async: false,
     expects: null,
+
     requirement(input) {
       try {
         new URL(input);
@@ -72150,17 +73146,21 @@ function url(message$1) {
         return false;
       }
     },
+
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !this.requirement(dataset.value)) _addIssue(this, "URL", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/uuid/uuid.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function uuid(message$1) {
   return {
     kind: "validation",
@@ -72170,16 +73170,19 @@ function uuid(message$1) {
     expects: null,
     requirement: UUID_REGEX,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !this.requirement.test(dataset.value)) _addIssue(this, "UUID", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/value/value.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function value(requirement, message$1) {
   return {
     kind: "validation",
@@ -72189,39 +73192,47 @@ function value(requirement, message$1) {
     expects: requirement instanceof Date ? requirement.toJSON() : /* @__PURE__ */_stringify(requirement),
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !(this.requirement <= dataset.value && this.requirement >= dataset.value)) _addIssue(this, "value", dataset, config$1, {
         received: dataset.value instanceof Date ? dataset.value.toJSON() : /* @__PURE__ */_stringify(dataset.value)
       });
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/values/values.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function values(requirement, message$1) {
   return {
     kind: "validation",
     type: "values",
     reference: values,
     async: false,
-    expects: `${ /* @__PURE__ */_joinExpects(requirement.map(value$1 => value$1 instanceof Date ? value$1.toJSON() : /* @__PURE__ */_stringify(value$1)), "|")}`,
+    expects: `${
+    /* @__PURE__ */
+    _joinExpects(requirement.map(value$1 => value$1 instanceof Date ? value$1.toJSON() : /* @__PURE__ */_stringify(value$1)), "|")}`,
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed && !this.requirement.some(value$1 => value$1 <= dataset.value && value$1 >= dataset.value)) _addIssue(this, "value", dataset, config$1, {
         received: dataset.value instanceof Date ? dataset.value.toJSON() : /* @__PURE__ */_stringify(dataset.value)
       });
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/actions/words/words.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function words(locales, requirement, message$1) {
   return {
     kind: "validation",
@@ -72232,20 +73243,23 @@ function words(locales, requirement, message$1) {
     locales,
     requirement,
     message: message$1,
+
     "~run"(dataset, config$1) {
       if (dataset.typed) {
         const count = /* @__PURE__ */_getWordCount(this.locales, dataset.value);
+
         if (count !== this.requirement) _addIssue(this, "words", dataset, config$1, {
           received: `${count}`
         });
       }
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/methods/assert/assert.ts
+
 /**
 * Checks if the input matches the schema. As this is an assertion function, it
 * can be used as a type guard.
@@ -72253,6 +73267,8 @@ function words(locales, requirement, message$1) {
 * @param schema The schema to be used.
 * @param input The input to be tested.
 */
+
+
 function assert(schema, input) {
   const issues = schema["~run"]({
     value: input
@@ -72260,10 +73276,9 @@ function assert(schema, input) {
     abortEarly: true
   }).issues;
   if (issues) throw new ValiError(issues);
-}
-
-//#endregion
+} //#endregion
 //#region src/methods/config/config.ts
+
 /**
 * Changes the local configuration of a schema.
 *
@@ -72272,24 +73287,27 @@ function assert(schema, input) {
 *
 * @returns The configured schema.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function config(schema, config$1) {
-  return {
-    ...schema,
+  return { ...schema,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config_) {
-      return schema["~run"](dataset, {
-        ...config_,
+      return schema["~run"](dataset, { ...config_,
         ...config$1
       });
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/methods/getFallback/getFallback.ts
+
 /**
 * Returns the fallback value of the schema.
 *
@@ -72299,13 +73317,15 @@ function config(schema, config$1) {
 *
 * @returns The fallback value.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function getFallback(schema, dataset, config$1) {
   return typeof schema.fallback === "function" ? schema.fallback(dataset, config$1) : schema.fallback;
-}
-
-//#endregion
+} //#endregion
 //#region src/methods/fallback/fallback.ts
+
 /**
 * Returns a fallback value as output if the input does not match the schema.
 *
@@ -72314,14 +73334,18 @@ function getFallback(schema, dataset, config$1) {
 *
 * @returns The passed schema.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function fallback(schema, fallback$1) {
-  return {
-    ...schema,
+  return { ...schema,
     fallback: fallback$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       const outputDataset = schema["~run"](dataset, config$1);
       return outputDataset.issues ? {
@@ -72329,11 +73353,11 @@ function fallback(schema, fallback$1) {
         value: /* @__PURE__ */getFallback(this, outputDataset, config$1)
       } : outputDataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/methods/fallback/fallbackAsync.ts
+
 /**
 * Returns a fallback value as output if the input does not match the schema.
 *
@@ -72342,15 +73366,19 @@ function fallback(schema, fallback$1) {
 *
 * @returns The passed schema.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function fallbackAsync(schema, fallback$1) {
-  return {
-    ...schema,
+  return { ...schema,
     fallback: fallback$1,
     async: true,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     async "~run"(dataset, config$1) {
       const outputDataset = await schema["~run"](dataset, config$1);
       return outputDataset.issues ? {
@@ -72358,26 +73386,30 @@ function fallbackAsync(schema, fallback$1) {
         value: await /* @__PURE__ */getFallback(this, outputDataset, config$1)
       } : outputDataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/methods/flatten/flatten.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function flatten(issues) {
   const flatErrors = {};
+
   for (const issue of issues) if (issue.path) {
     const dotPath = /* @__PURE__ */getDotPath(issue);
+
     if (dotPath) {
       if (!flatErrors.nested) flatErrors.nested = {};
       if (flatErrors.nested[dotPath]) flatErrors.nested[dotPath].push(issue.message);else flatErrors.nested[dotPath] = [issue.message];
     } else if (flatErrors.other) flatErrors.other.push(issue.message);else flatErrors.other = [issue.message];
   } else if (flatErrors.root) flatErrors.root.push(issue.message);else flatErrors.root = [issue.message];
-  return flatErrors;
-}
 
-//#endregion
+  return flatErrors;
+} //#endregion
 //#region src/methods/forward/forward.ts
+
 /**
 * Forwards the issues of the passed validation action.
 *
@@ -72386,16 +73418,21 @@ function flatten(issues) {
 *
 * @returns The modified action.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function forward(action, path) {
-  return {
-    ...action,
+  return { ...action,
+
     "~run"(dataset, config$1) {
       const prevIssues = dataset.issues && [...dataset.issues];
       dataset = action["~run"](dataset, config$1);
+
       if (dataset.issues) {
         for (const issue of dataset.issues) if (!prevIssues?.includes(issue)) {
           let pathInput = dataset.value;
+
           for (const key of path) {
             const pathValue = pathInput[key];
             const pathItem = {
@@ -72411,13 +73448,14 @@ function forward(action, path) {
           }
         }
       }
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/methods/forward/forwardAsync.ts
+
 /**
 * Forwards the issues of the passed validation action.
 *
@@ -72426,17 +73464,22 @@ function forward(action, path) {
 *
 * @returns The modified action.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function forwardAsync(action, path) {
-  return {
-    ...action,
+  return { ...action,
     async: true,
+
     async "~run"(dataset, config$1) {
       const prevIssues = dataset.issues && [...dataset.issues];
       dataset = await action["~run"](dataset, config$1);
+
       if (dataset.issues) {
         for (const issue of dataset.issues) if (!prevIssues?.includes(issue)) {
           let pathInput = dataset.value;
+
           for (const key of path) {
             const pathValue = pathInput[key];
             const pathItem = {
@@ -72452,13 +73495,14 @@ function forwardAsync(action, path) {
           }
         }
       }
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/methods/getDefault/getDefault.ts
+
 /**
 * Returns the default value of the schema.
 *
@@ -72468,13 +73512,15 @@ function forwardAsync(action, path) {
 *
 * @returns The default value.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function getDefault(schema, dataset, config$1) {
   return typeof schema.default === "function" ? schema.default(dataset, config$1) : schema.default;
-}
-
-//#endregion
+} //#endregion
 //#region src/methods/getDefaults/getDefaults.ts
+
 /**
 * Returns the default values of the schema.
 *
@@ -72486,19 +73532,24 @@ function getDefault(schema, dataset, config$1) {
 *
 * @returns The default values.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function getDefaults(schema) {
   if ("entries" in schema) {
     const object$1 = {};
+
     for (const key in schema.entries) object$1[key] = /* @__PURE__ */getDefaults(schema.entries[key]);
+
     return object$1;
   }
+
   if ("items" in schema) return schema.items.map(getDefaults);
   return /* @__PURE__ */getDefault(schema);
-}
-
-//#endregion
+} //#endregion
 //#region src/methods/getDefaults/getDefaultsAsync.ts
+
 /**
 * Returns the default values of the schema.
 *
@@ -72510,15 +73561,17 @@ function getDefaults(schema) {
 *
 * @returns The default values.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 async function getDefaultsAsync(schema) {
   if ("entries" in schema) return Object.fromEntries(await Promise.all(Object.entries(schema.entries).map(async ([key, value$1]) => [key, await /* @__PURE__ */getDefaultsAsync(value$1)])));
   if ("items" in schema) return Promise.all(schema.items.map(getDefaultsAsync));
   return /* @__PURE__ */getDefault(schema);
-}
-
-//#endregion
+} //#endregion
 //#region src/methods/getDescription/getDescription.ts
+
 /**
 * Returns the description of the schema.
 *
@@ -72531,13 +73584,15 @@ async function getDefaultsAsync(schema) {
 *
 * @beta
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function getDescription(schema) {
   return /* @__PURE__ */_getLastMetadata(schema, "description");
-}
-
-//#endregion
+} //#endregion
 //#region src/methods/getExamples/getExamples.ts
+
 /**
 * Returns the examples of a schema.
 *
@@ -72550,20 +73605,24 @@ function getDescription(schema) {
 *
 * @beta
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function getExamples(schema) {
   const examples$1 = [];
+
   function depthFirstCollect(schema$1) {
     if ("pipe" in schema$1) {
       for (const item of schema$1.pipe) if (item.kind === "schema" && "pipe" in item) depthFirstCollect(item);else if (item.kind === "metadata" && item.type === "examples") examples$1.push(...item.examples);
     }
   }
+
   depthFirstCollect(schema);
   return examples$1;
-}
-
-//#endregion
+} //#endregion
 //#region src/methods/getFallbacks/getFallbacks.ts
+
 /**
 * Returns the fallback values of the schema.
 *
@@ -72575,19 +73634,24 @@ function getExamples(schema) {
 *
 * @returns The fallback values.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function getFallbacks(schema) {
   if ("entries" in schema) {
     const object$1 = {};
+
     for (const key in schema.entries) object$1[key] = /* @__PURE__ */getFallbacks(schema.entries[key]);
+
     return object$1;
   }
+
   if ("items" in schema) return schema.items.map(getFallbacks);
   return /* @__PURE__ */getFallback(schema);
-}
-
-//#endregion
+} //#endregion
 //#region src/methods/getFallbacks/getFallbacksAsync.ts
+
 /**
 * Returns the fallback values of the schema.
 *
@@ -72599,15 +73663,17 @@ function getFallbacks(schema) {
 *
 * @returns The fallback values.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 async function getFallbacksAsync(schema) {
   if ("entries" in schema) return Object.fromEntries(await Promise.all(Object.entries(schema.entries).map(async ([key, value$1]) => [key, await /* @__PURE__ */getFallbacksAsync(value$1)])));
   if ("items" in schema) return Promise.all(schema.items.map(getFallbacksAsync));
   return /* @__PURE__ */getFallback(schema);
-}
-
-//#endregion
+} //#endregion
 //#region src/methods/getMetadata/getMetadata.ts
+
 /**
 * Returns the metadata of a schema.
 *
@@ -72620,20 +73686,24 @@ async function getFallbacksAsync(schema) {
 *
 * @beta
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function getMetadata(schema) {
   const result = {};
+
   function depthFirstMerge(schema$1) {
     if ("pipe" in schema$1) {
       for (const item of schema$1.pipe) if (item.kind === "schema" && "pipe" in item) depthFirstMerge(item);else if (item.kind === "metadata" && item.type === "metadata") Object.assign(result, item.metadata);
     }
   }
+
   depthFirstMerge(schema);
   return result;
-}
-
-//#endregion
+} //#endregion
 //#region src/methods/getTitle/getTitle.ts
+
 /**
 * Returns the title of the schema.
 *
@@ -72646,13 +73716,15 @@ function getMetadata(schema) {
 *
 * @beta
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function getTitle(schema) {
   return /* @__PURE__ */_getLastMetadata(schema, "title");
-}
-
-//#endregion
+} //#endregion
 //#region src/methods/is/is.ts
+
 /**
 * Checks if the input matches the schema. By using a type predicate, this
 * function can be used as a type guard.
@@ -72662,17 +73734,19 @@ function getTitle(schema) {
 *
 * @returns Whether the input matches the schema.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function is(schema, input) {
   return !schema["~run"]({
     value: input
   }, {
     abortEarly: true
   }).issues;
-}
-
-//#endregion
+} //#endregion
 //#region src/schemas/any/any.ts
+
 /**
 * Creates an any schema.
 *
@@ -72682,7 +73756,10 @@ function is(schema, input) {
 *
 * @returns An any schema.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function any() {
   return {
     kind: "schema",
@@ -72690,19 +73767,23 @@ function any() {
     reference: any,
     expects: "any",
     async: false,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset) {
       dataset.typed = true;
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/array/array.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function array(item, message$1) {
   return {
     kind: "schema",
@@ -72712,19 +73793,24 @@ function array(item, message$1) {
     async: false,
     item,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       const input = dataset.value;
+
       if (Array.isArray(input)) {
         dataset.typed = true;
         dataset.value = [];
+
         for (let key = 0; key < input.length; key++) {
           const value$1 = input[key];
           const itemDataset = this.item["~run"]({
             value: value$1
           }, config$1);
+
           if (itemDataset.issues) {
             const pathItem = {
               type: "array",
@@ -72733,28 +73819,35 @@ function array(item, message$1) {
               key,
               value: value$1
             };
+
             for (const issue of itemDataset.issues) {
               if (issue.path) issue.path.unshift(pathItem);else issue.path = [pathItem];
               dataset.issues?.push(issue);
             }
+
             if (!dataset.issues) dataset.issues = itemDataset.issues;
+
             if (config$1.abortEarly) {
               dataset.typed = false;
               break;
             }
           }
+
           if (!itemDataset.typed) dataset.typed = false;
           dataset.value.push(itemDataset.value);
         }
       } else _addIssue(this, "type", dataset, config$1);
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/array/arrayAsync.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function arrayAsync(item, message$1) {
   return {
     kind: "schema",
@@ -72764,19 +73857,24 @@ function arrayAsync(item, message$1) {
     async: true,
     item,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     async "~run"(dataset, config$1) {
       const input = dataset.value;
+
       if (Array.isArray(input)) {
         dataset.typed = true;
         dataset.value = [];
         const itemDatasets = await Promise.all(input.map(value$1 => this.item["~run"]({
           value: value$1
         }, config$1)));
+
         for (let key = 0; key < itemDatasets.length; key++) {
           const itemDataset = itemDatasets[key];
+
           if (itemDataset.issues) {
             const pathItem = {
               type: "array",
@@ -72785,28 +73883,35 @@ function arrayAsync(item, message$1) {
               key,
               value: input[key]
             };
+
             for (const issue of itemDataset.issues) {
               if (issue.path) issue.path.unshift(pathItem);else issue.path = [pathItem];
               dataset.issues?.push(issue);
             }
+
             if (!dataset.issues) dataset.issues = itemDataset.issues;
+
             if (config$1.abortEarly) {
               dataset.typed = false;
               break;
             }
           }
+
           if (!itemDataset.typed) dataset.typed = false;
           dataset.value.push(itemDataset.value);
         }
       } else _addIssue(this, "type", dataset, config$1);
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/bigint/bigint.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function bigint(message$1) {
   return {
     kind: "schema",
@@ -72815,19 +73920,23 @@ function bigint(message$1) {
     expects: "bigint",
     async: false,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       if (typeof dataset.value === "bigint") dataset.typed = true;else _addIssue(this, "type", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/blob/blob.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function blob(message$1) {
   return {
     kind: "schema",
@@ -72836,19 +73945,23 @@ function blob(message$1) {
     expects: "Blob",
     async: false,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       if (dataset.value instanceof Blob) dataset.typed = true;else _addIssue(this, "type", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/boolean/boolean.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function boolean(message$1) {
   return {
     kind: "schema",
@@ -72857,19 +73970,23 @@ function boolean(message$1) {
     expects: "boolean",
     async: false,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       if (typeof dataset.value === "boolean") dataset.typed = true;else _addIssue(this, "type", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/custom/custom.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function custom(check$1, message$1) {
   return {
     kind: "schema",
@@ -72879,19 +73996,23 @@ function custom(check$1, message$1) {
     async: false,
     check: check$1,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       if (this.check(dataset.value)) dataset.typed = true;else _addIssue(this, "type", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/custom/customAsync.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function customAsync(check$1, message$1) {
   return {
     kind: "schema",
@@ -72901,19 +74022,23 @@ function customAsync(check$1, message$1) {
     async: true,
     check: check$1,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     async "~run"(dataset, config$1) {
       if (await this.check(dataset.value)) dataset.typed = true;else _addIssue(this, "type", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/date/date.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function date(message$1) {
   return {
     kind: "schema",
@@ -72922,9 +74047,11 @@ function date(message$1) {
     expects: "Date",
     async: false,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       if (dataset.value instanceof Date) {
         if (!isNaN(dataset.value)) dataset.typed = true;else _addIssue(this, "type", dataset, config$1, {
@@ -72933,15 +74060,19 @@ function date(message$1) {
       } else _addIssue(this, "type", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/enum/enum.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function enum_(enum__, message$1) {
   const options = [];
+
   for (const key in enum__) if (`${+key}` !== key || typeof enum__[key] !== "string" || !Object.is(enum__[enum__[key]], +key)) options.push(enum__[key]);
+
   return {
     kind: "schema",
     type: "enum",
@@ -72951,19 +74082,23 @@ function enum_(enum__, message$1) {
     enum: enum__,
     options,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       if (this.options.includes(dataset.value)) dataset.typed = true;else _addIssue(this, "type", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/exactOptional/exactOptional.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function exactOptional(wrapped, default_) {
   return {
     kind: "schema",
@@ -72973,18 +74108,22 @@ function exactOptional(wrapped, default_) {
     async: false,
     wrapped,
     default: default_,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       return this.wrapped["~run"](dataset, config$1);
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/exactOptional/exactOptionalAsync.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function exactOptionalAsync(wrapped, default_) {
   return {
     kind: "schema",
@@ -72994,18 +74133,22 @@ function exactOptionalAsync(wrapped, default_) {
     async: true,
     wrapped,
     default: default_,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     async "~run"(dataset, config$1) {
       return this.wrapped["~run"](dataset, config$1);
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/file/file.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function file(message$1) {
   return {
     kind: "schema",
@@ -73014,19 +74157,23 @@ function file(message$1) {
     expects: "File",
     async: false,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       if (dataset.value instanceof File) dataset.typed = true;else _addIssue(this, "type", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/function/function.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function function_(message$1) {
   return {
     kind: "schema",
@@ -73035,19 +74182,23 @@ function function_(message$1) {
     expects: "Function",
     async: false,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       if (typeof dataset.value === "function") dataset.typed = true;else _addIssue(this, "type", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/instance/instance.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function instance(class_, message$1) {
   return {
     kind: "schema",
@@ -73057,18 +74208,20 @@ function instance(class_, message$1) {
     async: false,
     class: class_,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       if (dataset.value instanceof this.class) dataset.typed = true;else _addIssue(this, "type", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/intersect/utils/_merge/_merge.ts
+
 /**
 * Merges two values into one single output.
 *
@@ -73079,43 +74232,54 @@ function instance(class_, message$1) {
 *
 * @internal
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function _merge(value1, value2) {
   if (typeof value1 === typeof value2) {
     if (value1 === value2 || value1 instanceof Date && value2 instanceof Date && +value1 === +value2) return {
       value: value1
     };
+
     if (value1 && value2 && value1.constructor === Object && value2.constructor === Object) {
       for (const key in value2) if (key in value1) {
         const dataset = /* @__PURE__ */_merge(value1[key], value2[key]);
+
         if (dataset.issue) return dataset;
         value1[key] = dataset.value;
       } else value1[key] = value2[key];
+
       return {
         value: value1
       };
     }
+
     if (Array.isArray(value1) && Array.isArray(value2)) {
       if (value1.length === value2.length) {
         for (let index = 0; index < value1.length; index++) {
           const dataset = /* @__PURE__ */_merge(value1[index], value2[index]);
+
           if (dataset.issue) return dataset;
           value1[index] = dataset.value;
         }
+
         return {
           value: value1
         };
       }
     }
   }
+
   return {
     issue: true
   };
-}
-
-//#endregion
+} //#endregion
 //#region src/schemas/intersect/intersect.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function intersect(options, message$1) {
   return {
     kind: "schema",
@@ -73125,50 +74289,64 @@ function intersect(options, message$1) {
     async: false,
     options,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       if (this.options.length) {
         const input = dataset.value;
         let outputs;
         dataset.typed = true;
+
         for (const schema of this.options) {
           const optionDataset = schema["~run"]({
             value: input
           }, config$1);
+
           if (optionDataset.issues) {
             if (dataset.issues) dataset.issues.push(...optionDataset.issues);else dataset.issues = optionDataset.issues;
+
             if (config$1.abortEarly) {
               dataset.typed = false;
               break;
             }
           }
+
           if (!optionDataset.typed) dataset.typed = false;
           if (dataset.typed) if (outputs) outputs.push(optionDataset.value);else outputs = [optionDataset.value];
         }
+
         if (dataset.typed) {
           dataset.value = outputs[0];
+
           for (let index = 1; index < outputs.length; index++) {
             const mergeDataset = /* @__PURE__ */_merge(dataset.value, outputs[index]);
+
             if (mergeDataset.issue) {
               _addIssue(this, "type", dataset, config$1, {
                 received: "unknown"
               });
+
               break;
             }
+
             dataset.value = mergeDataset.value;
           }
         }
       } else _addIssue(this, "type", dataset, config$1);
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/intersect/intersectAsync.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function intersectAsync(options, message$1) {
   return {
     kind: "schema",
@@ -73178,9 +74356,11 @@ function intersectAsync(options, message$1) {
     async: true,
     options,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     async "~run"(dataset, config$1) {
       if (this.options.length) {
         const input = dataset.value;
@@ -73189,38 +74369,47 @@ function intersectAsync(options, message$1) {
         const optionDatasets = await Promise.all(this.options.map(schema => schema["~run"]({
           value: input
         }, config$1)));
+
         for (const optionDataset of optionDatasets) {
           if (optionDataset.issues) {
             if (dataset.issues) dataset.issues.push(...optionDataset.issues);else dataset.issues = optionDataset.issues;
+
             if (config$1.abortEarly) {
               dataset.typed = false;
               break;
             }
           }
+
           if (!optionDataset.typed) dataset.typed = false;
           if (dataset.typed) if (outputs) outputs.push(optionDataset.value);else outputs = [optionDataset.value];
         }
+
         if (dataset.typed) {
           dataset.value = outputs[0];
+
           for (let index = 1; index < outputs.length; index++) {
             const mergeDataset = /* @__PURE__ */_merge(dataset.value, outputs[index]);
+
             if (mergeDataset.issue) {
               _addIssue(this, "type", dataset, config$1, {
                 received: "unknown"
               });
+
               break;
             }
+
             dataset.value = mergeDataset.value;
           }
         }
       } else _addIssue(this, "type", dataset, config$1);
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/lazy/lazy.ts
+
 /**
 * Creates a lazy schema.
 *
@@ -73228,7 +74417,10 @@ function intersectAsync(options, message$1) {
 *
 * @returns A lazy schema.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function lazy(getter) {
   return {
     kind: "schema",
@@ -73237,17 +74429,19 @@ function lazy(getter) {
     expects: "unknown",
     async: false,
     getter,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       return this.getter(dataset.value)["~run"](dataset, config$1);
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/lazy/lazyAsync.ts
+
 /**
 * Creates a lazy schema.
 *
@@ -73255,7 +74449,10 @@ function lazy(getter) {
 *
 * @returns A lazy schema.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function lazyAsync(getter) {
   return {
     kind: "schema",
@@ -73264,18 +74461,22 @@ function lazyAsync(getter) {
     expects: "unknown",
     async: true,
     getter,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     async "~run"(dataset, config$1) {
       return (await this.getter(dataset.value))["~run"](dataset, config$1);
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/literal/literal.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function literal(literal_, message$1) {
   return {
     kind: "schema",
@@ -73285,19 +74486,23 @@ function literal(literal_, message$1) {
     async: false,
     literal: literal_,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       if (dataset.value === this.literal) dataset.typed = true;else _addIssue(this, "type", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/looseObject/looseObject.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function looseObject(entries$1, message$1) {
   return {
     kind: "schema",
@@ -73307,21 +74512,27 @@ function looseObject(entries$1, message$1) {
     async: false,
     entries: entries$1,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       const input = dataset.value;
+
       if (input && typeof input === "object") {
         dataset.typed = true;
         dataset.value = {};
+
         for (const key in this.entries) {
           const valueSchema = this.entries[key];
+
           if (key in input || (valueSchema.type === "exact_optional" || valueSchema.type === "optional" || valueSchema.type === "nullish") && valueSchema.default !== void 0) {
             const value$1 = key in input ? input[key] : /* @__PURE__ */getDefault(valueSchema);
             const valueDataset = valueSchema["~run"]({
               value: value$1
             }, config$1);
+
             if (valueDataset.issues) {
               const pathItem = {
                 type: "object",
@@ -73330,16 +74541,20 @@ function looseObject(entries$1, message$1) {
                 key,
                 value: value$1
               };
+
               for (const issue of valueDataset.issues) {
                 if (issue.path) issue.path.unshift(pathItem);else issue.path = [pathItem];
                 dataset.issues?.push(issue);
               }
+
               if (!dataset.issues) dataset.issues = valueDataset.issues;
+
               if (config$1.abortEarly) {
                 dataset.typed = false;
                 break;
               }
             }
+
             if (!valueDataset.typed) dataset.typed = false;
             dataset.value[key] = valueDataset.value;
           } else if (valueSchema.fallback !== void 0) dataset.value[key] = /* @__PURE__ */getFallback(valueSchema);else if (valueSchema.type !== "exact_optional" && valueSchema.type !== "optional" && valueSchema.type !== "nullish") {
@@ -73354,21 +74569,26 @@ function looseObject(entries$1, message$1) {
                 value: input[key]
               }]
             });
+
             if (config$1.abortEarly) break;
           }
         }
+
         if (!dataset.issues || !config$1.abortEarly) {
-          for (const key in input) if (/* @__PURE__ */_isValidObjectKey(input, key) && !(key in this.entries)) dataset.value[key] = input[key];
+          for (const key in input) if ( /* @__PURE__ */_isValidObjectKey(input, key) && !(key in this.entries)) dataset.value[key] = input[key];
         }
       } else _addIssue(this, "type", dataset, config$1);
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/looseObject/looseObjectAsync.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function looseObjectAsync(entries$1, message$1) {
   return {
     kind: "schema",
@@ -73378,11 +74598,14 @@ function looseObjectAsync(entries$1, message$1) {
     async: true,
     entries: entries$1,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     async "~run"(dataset, config$1) {
       const input = dataset.value;
+
       if (input && typeof input === "object") {
         dataset.typed = true;
         dataset.value = {};
@@ -73393,8 +74616,10 @@ function looseObjectAsync(entries$1, message$1) {
               value: value$1
             }, config$1)];
           }
+
           return [key, input[key], valueSchema, null];
         }));
+
         for (const [key, value$1, valueSchema, valueDataset] of valueDatasets) if (valueDataset) {
           if (valueDataset.issues) {
             const pathItem = {
@@ -73404,16 +74629,20 @@ function looseObjectAsync(entries$1, message$1) {
               key,
               value: value$1
             };
+
             for (const issue of valueDataset.issues) {
               if (issue.path) issue.path.unshift(pathItem);else issue.path = [pathItem];
               dataset.issues?.push(issue);
             }
+
             if (!dataset.issues) dataset.issues = valueDataset.issues;
+
             if (config$1.abortEarly) {
               dataset.typed = false;
               break;
             }
           }
+
           if (!valueDataset.typed) dataset.typed = false;
           dataset.value[key] = valueDataset.value;
         } else if (valueSchema.fallback !== void 0) dataset.value[key] = await /* @__PURE__ */getFallback(valueSchema);else if (valueSchema.type !== "exact_optional" && valueSchema.type !== "optional" && valueSchema.type !== "nullish") {
@@ -73428,20 +74657,25 @@ function looseObjectAsync(entries$1, message$1) {
               value: value$1
             }]
           });
+
           if (config$1.abortEarly) break;
         }
+
         if (!dataset.issues || !config$1.abortEarly) {
-          for (const key in input) if (/* @__PURE__ */_isValidObjectKey(input, key) && !(key in this.entries)) dataset.value[key] = input[key];
+          for (const key in input) if ( /* @__PURE__ */_isValidObjectKey(input, key) && !(key in this.entries)) dataset.value[key] = input[key];
         }
       } else _addIssue(this, "type", dataset, config$1);
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/looseTuple/looseTuple.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function looseTuple(items, message$1) {
   return {
     kind: "schema",
@@ -73451,19 +74685,24 @@ function looseTuple(items, message$1) {
     async: false,
     items,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       const input = dataset.value;
+
       if (Array.isArray(input)) {
         dataset.typed = true;
         dataset.value = [];
+
         for (let key = 0; key < this.items.length; key++) {
           const value$1 = input[key];
           const itemDataset = this.items[key]["~run"]({
             value: value$1
           }, config$1);
+
           if (itemDataset.issues) {
             const pathItem = {
               type: "array",
@@ -73472,29 +74711,37 @@ function looseTuple(items, message$1) {
               key,
               value: value$1
             };
+
             for (const issue of itemDataset.issues) {
               if (issue.path) issue.path.unshift(pathItem);else issue.path = [pathItem];
               dataset.issues?.push(issue);
             }
+
             if (!dataset.issues) dataset.issues = itemDataset.issues;
+
             if (config$1.abortEarly) {
               dataset.typed = false;
               break;
             }
           }
+
           if (!itemDataset.typed) dataset.typed = false;
           dataset.value.push(itemDataset.value);
         }
+
         if (!dataset.issues || !config$1.abortEarly) for (let key = this.items.length; key < input.length; key++) dataset.value.push(input[key]);
       } else _addIssue(this, "type", dataset, config$1);
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/looseTuple/looseTupleAsync.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function looseTupleAsync(items, message$1) {
   return {
     kind: "schema",
@@ -73504,11 +74751,14 @@ function looseTupleAsync(items, message$1) {
     async: true,
     items,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     async "~run"(dataset, config$1) {
       const input = dataset.value;
+
       if (Array.isArray(input)) {
         dataset.typed = true;
         dataset.value = [];
@@ -73518,6 +74768,7 @@ function looseTupleAsync(items, message$1) {
             value: value$1
           }, config$1)];
         }));
+
         for (const [key, value$1, itemDataset] of itemDatasets) {
           if (itemDataset.issues) {
             const pathItem = {
@@ -73527,29 +74778,37 @@ function looseTupleAsync(items, message$1) {
               key,
               value: value$1
             };
+
             for (const issue of itemDataset.issues) {
               if (issue.path) issue.path.unshift(pathItem);else issue.path = [pathItem];
               dataset.issues?.push(issue);
             }
+
             if (!dataset.issues) dataset.issues = itemDataset.issues;
+
             if (config$1.abortEarly) {
               dataset.typed = false;
               break;
             }
           }
+
           if (!itemDataset.typed) dataset.typed = false;
           dataset.value.push(itemDataset.value);
         }
+
         if (!dataset.issues || !config$1.abortEarly) for (let key = this.items.length; key < input.length; key++) dataset.value.push(input[key]);
       } else _addIssue(this, "type", dataset, config$1);
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/map/map.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function map(key, value$1, message$1) {
   return {
     kind: "schema",
@@ -73560,18 +74819,23 @@ function map(key, value$1, message$1) {
     key,
     value: value$1,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       const input = dataset.value;
+
       if (input instanceof Map) {
         dataset.typed = true;
         dataset.value = /* @__PURE__ */new Map();
+
         for (const [inputKey, inputValue] of input) {
           const keyDataset = this.key["~run"]({
             value: inputKey
           }, config$1);
+
           if (keyDataset.issues) {
             const pathItem = {
               type: "map",
@@ -73580,19 +74844,24 @@ function map(key, value$1, message$1) {
               key: inputKey,
               value: inputValue
             };
+
             for (const issue of keyDataset.issues) {
               if (issue.path) issue.path.unshift(pathItem);else issue.path = [pathItem];
               dataset.issues?.push(issue);
             }
+
             if (!dataset.issues) dataset.issues = keyDataset.issues;
+
             if (config$1.abortEarly) {
               dataset.typed = false;
               break;
             }
           }
+
           const valueDataset = this.value["~run"]({
             value: inputValue
           }, config$1);
+
           if (valueDataset.issues) {
             const pathItem = {
               type: "map",
@@ -73601,28 +74870,35 @@ function map(key, value$1, message$1) {
               key: inputKey,
               value: inputValue
             };
+
             for (const issue of valueDataset.issues) {
               if (issue.path) issue.path.unshift(pathItem);else issue.path = [pathItem];
               dataset.issues?.push(issue);
             }
+
             if (!dataset.issues) dataset.issues = valueDataset.issues;
+
             if (config$1.abortEarly) {
               dataset.typed = false;
               break;
             }
           }
+
           if (!keyDataset.typed || !valueDataset.typed) dataset.typed = false;
           dataset.value.set(keyDataset.value, valueDataset.value);
         }
       } else _addIssue(this, "type", dataset, config$1);
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/map/mapAsync.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function mapAsync(key, value$1, message$1) {
   return {
     kind: "schema",
@@ -73633,11 +74909,14 @@ function mapAsync(key, value$1, message$1) {
     key,
     value: value$1,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     async "~run"(dataset, config$1) {
       const input = dataset.value;
+
       if (input instanceof Map) {
         dataset.typed = true;
         dataset.value = /* @__PURE__ */new Map();
@@ -73646,6 +74925,7 @@ function mapAsync(key, value$1, message$1) {
         }, config$1), this.value["~run"]({
           value: inputValue
         }, config$1)])));
+
         for (const [inputKey, inputValue, keyDataset, valueDataset] of datasets) {
           if (keyDataset.issues) {
             const pathItem = {
@@ -73655,16 +74935,20 @@ function mapAsync(key, value$1, message$1) {
               key: inputKey,
               value: inputValue
             };
+
             for (const issue of keyDataset.issues) {
               if (issue.path) issue.path.unshift(pathItem);else issue.path = [pathItem];
               dataset.issues?.push(issue);
             }
+
             if (!dataset.issues) dataset.issues = keyDataset.issues;
+
             if (config$1.abortEarly) {
               dataset.typed = false;
               break;
             }
           }
+
           if (valueDataset.issues) {
             const pathItem = {
               type: "map",
@@ -73673,28 +74957,35 @@ function mapAsync(key, value$1, message$1) {
               key: inputKey,
               value: inputValue
             };
+
             for (const issue of valueDataset.issues) {
               if (issue.path) issue.path.unshift(pathItem);else issue.path = [pathItem];
               dataset.issues?.push(issue);
             }
+
             if (!dataset.issues) dataset.issues = valueDataset.issues;
+
             if (config$1.abortEarly) {
               dataset.typed = false;
               break;
             }
           }
+
           if (!keyDataset.typed || !valueDataset.typed) dataset.typed = false;
           dataset.value.set(keyDataset.value, valueDataset.value);
         }
       } else _addIssue(this, "type", dataset, config$1);
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/nan/nan.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function nan(message$1) {
   return {
     kind: "schema",
@@ -73703,19 +74994,23 @@ function nan(message$1) {
     expects: "NaN",
     async: false,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       if (Number.isNaN(dataset.value)) dataset.typed = true;else _addIssue(this, "type", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/never/never.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function never(message$1) {
   return {
     kind: "schema",
@@ -73724,19 +75019,24 @@ function never(message$1) {
     expects: "never",
     async: false,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       _addIssue(this, "type", dataset, config$1);
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/nonNullable/nonNullable.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function nonNullable(wrapped, message$1) {
   return {
     kind: "schema",
@@ -73746,20 +75046,24 @@ function nonNullable(wrapped, message$1) {
     async: false,
     wrapped,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       if (dataset.value !== null) dataset = this.wrapped["~run"](dataset, config$1);
       if (dataset.value === null) _addIssue(this, "type", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/nonNullable/nonNullableAsync.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function nonNullableAsync(wrapped, message$1) {
   return {
     kind: "schema",
@@ -73769,20 +75073,24 @@ function nonNullableAsync(wrapped, message$1) {
     async: true,
     wrapped,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     async "~run"(dataset, config$1) {
       if (dataset.value !== null) dataset = await this.wrapped["~run"](dataset, config$1);
       if (dataset.value === null) _addIssue(this, "type", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/nonNullish/nonNullish.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function nonNullish(wrapped, message$1) {
   return {
     kind: "schema",
@@ -73792,20 +75100,24 @@ function nonNullish(wrapped, message$1) {
     async: false,
     wrapped,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       if (!(dataset.value === null || dataset.value === void 0)) dataset = this.wrapped["~run"](dataset, config$1);
       if (dataset.value === null || dataset.value === void 0) _addIssue(this, "type", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/nonNullish/nonNullishAsync.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function nonNullishAsync(wrapped, message$1) {
   return {
     kind: "schema",
@@ -73815,20 +75127,24 @@ function nonNullishAsync(wrapped, message$1) {
     async: true,
     wrapped,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     async "~run"(dataset, config$1) {
       if (!(dataset.value === null || dataset.value === void 0)) dataset = await this.wrapped["~run"](dataset, config$1);
       if (dataset.value === null || dataset.value === void 0) _addIssue(this, "type", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/nonOptional/nonOptional.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function nonOptional(wrapped, message$1) {
   return {
     kind: "schema",
@@ -73838,20 +75154,24 @@ function nonOptional(wrapped, message$1) {
     async: false,
     wrapped,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       if (dataset.value !== void 0) dataset = this.wrapped["~run"](dataset, config$1);
       if (dataset.value === void 0) _addIssue(this, "type", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/nonOptional/nonOptionalAsync.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function nonOptionalAsync(wrapped, message$1) {
   return {
     kind: "schema",
@@ -73861,20 +75181,24 @@ function nonOptionalAsync(wrapped, message$1) {
     async: true,
     wrapped,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     async "~run"(dataset, config$1) {
       if (dataset.value !== void 0) dataset = await this.wrapped["~run"](dataset, config$1);
       if (dataset.value === void 0) _addIssue(this, "type", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/null/null.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function null_(message$1) {
   return {
     kind: "schema",
@@ -73883,19 +75207,23 @@ function null_(message$1) {
     expects: "null",
     async: false,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       if (dataset.value === null) dataset.typed = true;else _addIssue(this, "type", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/nullable/nullable.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function nullable(wrapped, default_) {
   return {
     kind: "schema",
@@ -73905,25 +75233,31 @@ function nullable(wrapped, default_) {
     async: false,
     wrapped,
     default: default_,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       if (dataset.value === null) {
         if (this.default !== void 0) dataset.value = /* @__PURE__ */getDefault(this, dataset, config$1);
+
         if (dataset.value === null) {
           dataset.typed = true;
           return dataset;
         }
       }
+
       return this.wrapped["~run"](dataset, config$1);
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/nullable/nullableAsync.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function nullableAsync(wrapped, default_) {
   return {
     kind: "schema",
@@ -73933,25 +75267,31 @@ function nullableAsync(wrapped, default_) {
     async: true,
     wrapped,
     default: default_,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     async "~run"(dataset, config$1) {
       if (dataset.value === null) {
         if (this.default !== void 0) dataset.value = await /* @__PURE__ */getDefault(this, dataset, config$1);
+
         if (dataset.value === null) {
           dataset.typed = true;
           return dataset;
         }
       }
+
       return this.wrapped["~run"](dataset, config$1);
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/nullish/nullish.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function nullish(wrapped, default_) {
   return {
     kind: "schema",
@@ -73961,25 +75301,31 @@ function nullish(wrapped, default_) {
     async: false,
     wrapped,
     default: default_,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       if (dataset.value === null || dataset.value === void 0) {
         if (this.default !== void 0) dataset.value = /* @__PURE__ */getDefault(this, dataset, config$1);
+
         if (dataset.value === null || dataset.value === void 0) {
           dataset.typed = true;
           return dataset;
         }
       }
+
       return this.wrapped["~run"](dataset, config$1);
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/nullish/nullishAsync.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function nullishAsync(wrapped, default_) {
   return {
     kind: "schema",
@@ -73989,25 +75335,31 @@ function nullishAsync(wrapped, default_) {
     async: true,
     wrapped,
     default: default_,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     async "~run"(dataset, config$1) {
       if (dataset.value === null || dataset.value === void 0) {
         if (this.default !== void 0) dataset.value = await /* @__PURE__ */getDefault(this, dataset, config$1);
+
         if (dataset.value === null || dataset.value === void 0) {
           dataset.typed = true;
           return dataset;
         }
       }
+
       return this.wrapped["~run"](dataset, config$1);
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/number/number.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function number(message$1) {
   return {
     kind: "schema",
@@ -74016,19 +75368,23 @@ function number(message$1) {
     expects: "number",
     async: false,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       if (typeof dataset.value === "number" && !isNaN(dataset.value)) dataset.typed = true;else _addIssue(this, "type", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/object/object.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function object(entries$1, message$1) {
   return {
     kind: "schema",
@@ -74038,21 +75394,27 @@ function object(entries$1, message$1) {
     async: false,
     entries: entries$1,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       const input = dataset.value;
+
       if (input && typeof input === "object") {
         dataset.typed = true;
         dataset.value = {};
+
         for (const key in this.entries) {
           const valueSchema = this.entries[key];
+
           if (key in input || (valueSchema.type === "exact_optional" || valueSchema.type === "optional" || valueSchema.type === "nullish") && valueSchema.default !== void 0) {
             const value$1 = key in input ? input[key] : /* @__PURE__ */getDefault(valueSchema);
             const valueDataset = valueSchema["~run"]({
               value: value$1
             }, config$1);
+
             if (valueDataset.issues) {
               const pathItem = {
                 type: "object",
@@ -74061,16 +75423,20 @@ function object(entries$1, message$1) {
                 key,
                 value: value$1
               };
+
               for (const issue of valueDataset.issues) {
                 if (issue.path) issue.path.unshift(pathItem);else issue.path = [pathItem];
                 dataset.issues?.push(issue);
               }
+
               if (!dataset.issues) dataset.issues = valueDataset.issues;
+
               if (config$1.abortEarly) {
                 dataset.typed = false;
                 break;
               }
             }
+
             if (!valueDataset.typed) dataset.typed = false;
             dataset.value[key] = valueDataset.value;
           } else if (valueSchema.fallback !== void 0) dataset.value[key] = /* @__PURE__ */getFallback(valueSchema);else if (valueSchema.type !== "exact_optional" && valueSchema.type !== "optional" && valueSchema.type !== "nullish") {
@@ -74085,18 +75451,22 @@ function object(entries$1, message$1) {
                 value: input[key]
               }]
             });
+
             if (config$1.abortEarly) break;
           }
         }
       } else _addIssue(this, "type", dataset, config$1);
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/object/objectAsync.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function objectAsync(entries$1, message$1) {
   return {
     kind: "schema",
@@ -74106,11 +75476,14 @@ function objectAsync(entries$1, message$1) {
     async: true,
     entries: entries$1,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     async "~run"(dataset, config$1) {
       const input = dataset.value;
+
       if (input && typeof input === "object") {
         dataset.typed = true;
         dataset.value = {};
@@ -74121,8 +75494,10 @@ function objectAsync(entries$1, message$1) {
               value: value$1
             }, config$1)];
           }
+
           return [key, input[key], valueSchema, null];
         }));
+
         for (const [key, value$1, valueSchema, valueDataset] of valueDatasets) if (valueDataset) {
           if (valueDataset.issues) {
             const pathItem = {
@@ -74132,16 +75507,20 @@ function objectAsync(entries$1, message$1) {
               key,
               value: value$1
             };
+
             for (const issue of valueDataset.issues) {
               if (issue.path) issue.path.unshift(pathItem);else issue.path = [pathItem];
               dataset.issues?.push(issue);
             }
+
             if (!dataset.issues) dataset.issues = valueDataset.issues;
+
             if (config$1.abortEarly) {
               dataset.typed = false;
               break;
             }
           }
+
           if (!valueDataset.typed) dataset.typed = false;
           dataset.value[key] = valueDataset.value;
         } else if (valueSchema.fallback !== void 0) dataset.value[key] = await /* @__PURE__ */getFallback(valueSchema);else if (valueSchema.type !== "exact_optional" && valueSchema.type !== "optional" && valueSchema.type !== "nullish") {
@@ -74156,17 +75535,21 @@ function objectAsync(entries$1, message$1) {
               value: value$1
             }]
           });
+
           if (config$1.abortEarly) break;
         }
       } else _addIssue(this, "type", dataset, config$1);
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/objectWithRest/objectWithRest.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function objectWithRest(entries$1, rest, message$1) {
   return {
     kind: "schema",
@@ -74177,21 +75560,27 @@ function objectWithRest(entries$1, rest, message$1) {
     entries: entries$1,
     rest,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       const input = dataset.value;
+
       if (input && typeof input === "object") {
         dataset.typed = true;
         dataset.value = {};
+
         for (const key in this.entries) {
           const valueSchema = this.entries[key];
+
           if (key in input || (valueSchema.type === "exact_optional" || valueSchema.type === "optional" || valueSchema.type === "nullish") && valueSchema.default !== void 0) {
             const value$1 = key in input ? input[key] : /* @__PURE__ */getDefault(valueSchema);
             const valueDataset = valueSchema["~run"]({
               value: value$1
             }, config$1);
+
             if (valueDataset.issues) {
               const pathItem = {
                 type: "object",
@@ -74200,16 +75589,20 @@ function objectWithRest(entries$1, rest, message$1) {
                 key,
                 value: value$1
               };
+
               for (const issue of valueDataset.issues) {
                 if (issue.path) issue.path.unshift(pathItem);else issue.path = [pathItem];
                 dataset.issues?.push(issue);
               }
+
               if (!dataset.issues) dataset.issues = valueDataset.issues;
+
               if (config$1.abortEarly) {
                 dataset.typed = false;
                 break;
               }
             }
+
             if (!valueDataset.typed) dataset.typed = false;
             dataset.value[key] = valueDataset.value;
           } else if (valueSchema.fallback !== void 0) dataset.value[key] = /* @__PURE__ */getFallback(valueSchema);else if (valueSchema.type !== "exact_optional" && valueSchema.type !== "optional" && valueSchema.type !== "nullish") {
@@ -74224,14 +75617,17 @@ function objectWithRest(entries$1, rest, message$1) {
                 value: input[key]
               }]
             });
+
             if (config$1.abortEarly) break;
           }
         }
+
         if (!dataset.issues || !config$1.abortEarly) {
-          for (const key in input) if (/* @__PURE__ */_isValidObjectKey(input, key) && !(key in this.entries)) {
+          for (const key in input) if ( /* @__PURE__ */_isValidObjectKey(input, key) && !(key in this.entries)) {
             const valueDataset = this.rest["~run"]({
               value: input[key]
             }, config$1);
+
             if (valueDataset.issues) {
               const pathItem = {
                 type: "object",
@@ -74240,29 +75636,36 @@ function objectWithRest(entries$1, rest, message$1) {
                 key,
                 value: input[key]
               };
+
               for (const issue of valueDataset.issues) {
                 if (issue.path) issue.path.unshift(pathItem);else issue.path = [pathItem];
                 dataset.issues?.push(issue);
               }
+
               if (!dataset.issues) dataset.issues = valueDataset.issues;
+
               if (config$1.abortEarly) {
                 dataset.typed = false;
                 break;
               }
             }
+
             if (!valueDataset.typed) dataset.typed = false;
             dataset.value[key] = valueDataset.value;
           }
         }
       } else _addIssue(this, "type", dataset, config$1);
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/objectWithRest/objectWithRestAsync.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function objectWithRestAsync(entries$1, rest, message$1) {
   return {
     kind: "schema",
@@ -74273,11 +75676,14 @@ function objectWithRestAsync(entries$1, rest, message$1) {
     entries: entries$1,
     rest,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     async "~run"(dataset, config$1) {
       const input = dataset.value;
+
       if (input && typeof input === "object") {
         dataset.typed = true;
         dataset.value = {};
@@ -74288,10 +75694,12 @@ function objectWithRestAsync(entries$1, rest, message$1) {
               value: value$1
             }, config$1)];
           }
+
           return [key, input[key], valueSchema, null];
         })), Promise.all(Object.entries(input).filter(([key]) => /* @__PURE__ */_isValidObjectKey(input, key) && !(key in this.entries)).map(async ([key, value$1]) => [key, value$1, await this.rest["~run"]({
           value: value$1
         }, config$1)]))]);
+
         for (const [key, value$1, valueSchema, valueDataset] of normalDatasets) if (valueDataset) {
           if (valueDataset.issues) {
             const pathItem = {
@@ -74301,16 +75709,20 @@ function objectWithRestAsync(entries$1, rest, message$1) {
               key,
               value: value$1
             };
+
             for (const issue of valueDataset.issues) {
               if (issue.path) issue.path.unshift(pathItem);else issue.path = [pathItem];
               dataset.issues?.push(issue);
             }
+
             if (!dataset.issues) dataset.issues = valueDataset.issues;
+
             if (config$1.abortEarly) {
               dataset.typed = false;
               break;
             }
           }
+
           if (!valueDataset.typed) dataset.typed = false;
           dataset.value[key] = valueDataset.value;
         } else if (valueSchema.fallback !== void 0) dataset.value[key] = await /* @__PURE__ */getFallback(valueSchema);else if (valueSchema.type !== "exact_optional" && valueSchema.type !== "optional" && valueSchema.type !== "nullish") {
@@ -74325,8 +75737,10 @@ function objectWithRestAsync(entries$1, rest, message$1) {
               value: value$1
             }]
           });
+
           if (config$1.abortEarly) break;
         }
+
         if (!dataset.issues || !config$1.abortEarly) for (const [key, value$1, valueDataset] of restDatasets) {
           if (valueDataset.issues) {
             const pathItem = {
@@ -74336,28 +75750,35 @@ function objectWithRestAsync(entries$1, rest, message$1) {
               key,
               value: value$1
             };
+
             for (const issue of valueDataset.issues) {
               if (issue.path) issue.path.unshift(pathItem);else issue.path = [pathItem];
               dataset.issues?.push(issue);
             }
+
             if (!dataset.issues) dataset.issues = valueDataset.issues;
+
             if (config$1.abortEarly) {
               dataset.typed = false;
               break;
             }
           }
+
           if (!valueDataset.typed) dataset.typed = false;
           dataset.value[key] = valueDataset.value;
         }
       } else _addIssue(this, "type", dataset, config$1);
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/optional/optional.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function optional(wrapped, default_) {
   return {
     kind: "schema",
@@ -74367,25 +75788,31 @@ function optional(wrapped, default_) {
     async: false,
     wrapped,
     default: default_,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       if (dataset.value === void 0) {
         if (this.default !== void 0) dataset.value = /* @__PURE__ */getDefault(this, dataset, config$1);
+
         if (dataset.value === void 0) {
           dataset.typed = true;
           return dataset;
         }
       }
+
       return this.wrapped["~run"](dataset, config$1);
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/optional/optionalAsync.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function optionalAsync(wrapped, default_) {
   return {
     kind: "schema",
@@ -74395,25 +75822,31 @@ function optionalAsync(wrapped, default_) {
     async: true,
     wrapped,
     default: default_,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     async "~run"(dataset, config$1) {
       if (dataset.value === void 0) {
         if (this.default !== void 0) dataset.value = await /* @__PURE__ */getDefault(this, dataset, config$1);
+
         if (dataset.value === void 0) {
           dataset.typed = true;
           return dataset;
         }
       }
+
       return this.wrapped["~run"](dataset, config$1);
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/picklist/picklist.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function picklist(options, message$1) {
   return {
     kind: "schema",
@@ -74423,19 +75856,23 @@ function picklist(options, message$1) {
     async: false,
     options,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       if (this.options.includes(dataset.value)) dataset.typed = true;else _addIssue(this, "type", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/promise/promise.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function promise(message$1) {
   return {
     kind: "schema",
@@ -74444,19 +75881,23 @@ function promise(message$1) {
     expects: "Promise",
     async: false,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       if (dataset.value instanceof Promise) dataset.typed = true;else _addIssue(this, "type", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/record/record.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function record(key, value$1, message$1) {
   return {
     kind: "schema",
@@ -74467,19 +75908,24 @@ function record(key, value$1, message$1) {
     key,
     value: value$1,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       const input = dataset.value;
+
       if (input && typeof input === "object") {
         dataset.typed = true;
         dataset.value = {};
-        for (const entryKey in input) if (/* @__PURE__ */_isValidObjectKey(input, entryKey)) {
+
+        for (const entryKey in input) if ( /* @__PURE__ */_isValidObjectKey(input, entryKey)) {
           const entryValue = input[entryKey];
           const keyDataset = this.key["~run"]({
             value: entryKey
           }, config$1);
+
           if (keyDataset.issues) {
             const pathItem = {
               type: "object",
@@ -74488,19 +75934,24 @@ function record(key, value$1, message$1) {
               key: entryKey,
               value: entryValue
             };
+
             for (const issue of keyDataset.issues) {
               issue.path = [pathItem];
               dataset.issues?.push(issue);
             }
+
             if (!dataset.issues) dataset.issues = keyDataset.issues;
+
             if (config$1.abortEarly) {
               dataset.typed = false;
               break;
             }
           }
+
           const valueDataset = this.value["~run"]({
             value: entryValue
           }, config$1);
+
           if (valueDataset.issues) {
             const pathItem = {
               type: "object",
@@ -74509,28 +75960,35 @@ function record(key, value$1, message$1) {
               key: entryKey,
               value: entryValue
             };
+
             for (const issue of valueDataset.issues) {
               if (issue.path) issue.path.unshift(pathItem);else issue.path = [pathItem];
               dataset.issues?.push(issue);
             }
+
             if (!dataset.issues) dataset.issues = valueDataset.issues;
+
             if (config$1.abortEarly) {
               dataset.typed = false;
               break;
             }
           }
+
           if (!keyDataset.typed || !valueDataset.typed) dataset.typed = false;
           if (keyDataset.typed) dataset.value[keyDataset.value] = valueDataset.value;
         }
       } else _addIssue(this, "type", dataset, config$1);
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/record/recordAsync.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function recordAsync(key, value$1, message$1) {
   return {
     kind: "schema",
@@ -74541,11 +75999,14 @@ function recordAsync(key, value$1, message$1) {
     key,
     value: value$1,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     async "~run"(dataset, config$1) {
       const input = dataset.value;
+
       if (input && typeof input === "object") {
         dataset.typed = true;
         dataset.value = {};
@@ -74554,6 +76015,7 @@ function recordAsync(key, value$1, message$1) {
         }, config$1), this.value["~run"]({
           value: entryValue
         }, config$1)])));
+
         for (const [entryKey, entryValue, keyDataset, valueDataset] of datasets) {
           if (keyDataset.issues) {
             const pathItem = {
@@ -74563,16 +76025,20 @@ function recordAsync(key, value$1, message$1) {
               key: entryKey,
               value: entryValue
             };
+
             for (const issue of keyDataset.issues) {
               issue.path = [pathItem];
               dataset.issues?.push(issue);
             }
+
             if (!dataset.issues) dataset.issues = keyDataset.issues;
+
             if (config$1.abortEarly) {
               dataset.typed = false;
               break;
             }
           }
+
           if (valueDataset.issues) {
             const pathItem = {
               type: "object",
@@ -74581,28 +76047,35 @@ function recordAsync(key, value$1, message$1) {
               key: entryKey,
               value: entryValue
             };
+
             for (const issue of valueDataset.issues) {
               if (issue.path) issue.path.unshift(pathItem);else issue.path = [pathItem];
               dataset.issues?.push(issue);
             }
+
             if (!dataset.issues) dataset.issues = valueDataset.issues;
+
             if (config$1.abortEarly) {
               dataset.typed = false;
               break;
             }
           }
+
           if (!keyDataset.typed || !valueDataset.typed) dataset.typed = false;
           if (keyDataset.typed) dataset.value[keyDataset.value] = valueDataset.value;
         }
       } else _addIssue(this, "type", dataset, config$1);
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/set/set.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function set(value$1, message$1) {
   return {
     kind: "schema",
@@ -74612,18 +76085,23 @@ function set(value$1, message$1) {
     async: false,
     value: value$1,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       const input = dataset.value;
+
       if (input instanceof Set) {
         dataset.typed = true;
         dataset.value = /* @__PURE__ */new Set();
+
         for (const inputValue of input) {
           const valueDataset = this.value["~run"]({
             value: inputValue
           }, config$1);
+
           if (valueDataset.issues) {
             const pathItem = {
               type: "set",
@@ -74632,28 +76110,35 @@ function set(value$1, message$1) {
               key: null,
               value: inputValue
             };
+
             for (const issue of valueDataset.issues) {
               if (issue.path) issue.path.unshift(pathItem);else issue.path = [pathItem];
               dataset.issues?.push(issue);
             }
+
             if (!dataset.issues) dataset.issues = valueDataset.issues;
+
             if (config$1.abortEarly) {
               dataset.typed = false;
               break;
             }
           }
+
           if (!valueDataset.typed) dataset.typed = false;
           dataset.value.add(valueDataset.value);
         }
       } else _addIssue(this, "type", dataset, config$1);
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/set/setAsync.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function setAsync(value$1, message$1) {
   return {
     kind: "schema",
@@ -74663,17 +76148,21 @@ function setAsync(value$1, message$1) {
     async: true,
     value: value$1,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     async "~run"(dataset, config$1) {
       const input = dataset.value;
+
       if (input instanceof Set) {
         dataset.typed = true;
         dataset.value = /* @__PURE__ */new Set();
         const valueDatasets = await Promise.all([...input].map(async inputValue => [inputValue, await this.value["~run"]({
           value: inputValue
         }, config$1)]));
+
         for (const [inputValue, valueDataset] of valueDatasets) {
           if (valueDataset.issues) {
             const pathItem = {
@@ -74683,28 +76172,35 @@ function setAsync(value$1, message$1) {
               key: null,
               value: inputValue
             };
+
             for (const issue of valueDataset.issues) {
               if (issue.path) issue.path.unshift(pathItem);else issue.path = [pathItem];
               dataset.issues?.push(issue);
             }
+
             if (!dataset.issues) dataset.issues = valueDataset.issues;
+
             if (config$1.abortEarly) {
               dataset.typed = false;
               break;
             }
           }
+
           if (!valueDataset.typed) dataset.typed = false;
           dataset.value.add(valueDataset.value);
         }
       } else _addIssue(this, "type", dataset, config$1);
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/strictObject/strictObject.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function strictObject(entries$1, message$1) {
   return {
     kind: "schema",
@@ -74714,21 +76210,27 @@ function strictObject(entries$1, message$1) {
     async: false,
     entries: entries$1,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       const input = dataset.value;
+
       if (input && typeof input === "object") {
         dataset.typed = true;
         dataset.value = {};
+
         for (const key in this.entries) {
           const valueSchema = this.entries[key];
+
           if (key in input || (valueSchema.type === "exact_optional" || valueSchema.type === "optional" || valueSchema.type === "nullish") && valueSchema.default !== void 0) {
             const value$1 = key in input ? input[key] : /* @__PURE__ */getDefault(valueSchema);
             const valueDataset = valueSchema["~run"]({
               value: value$1
             }, config$1);
+
             if (valueDataset.issues) {
               const pathItem = {
                 type: "object",
@@ -74737,16 +76239,20 @@ function strictObject(entries$1, message$1) {
                 key,
                 value: value$1
               };
+
               for (const issue of valueDataset.issues) {
                 if (issue.path) issue.path.unshift(pathItem);else issue.path = [pathItem];
                 dataset.issues?.push(issue);
               }
+
               if (!dataset.issues) dataset.issues = valueDataset.issues;
+
               if (config$1.abortEarly) {
                 dataset.typed = false;
                 break;
               }
             }
+
             if (!valueDataset.typed) dataset.typed = false;
             dataset.value[key] = valueDataset.value;
           } else if (valueSchema.fallback !== void 0) dataset.value[key] = /* @__PURE__ */getFallback(valueSchema);else if (valueSchema.type !== "exact_optional" && valueSchema.type !== "optional" && valueSchema.type !== "nullish") {
@@ -74761,9 +76267,11 @@ function strictObject(entries$1, message$1) {
                 value: input[key]
               }]
             });
+
             if (config$1.abortEarly) break;
           }
         }
+
         if (!dataset.issues || !config$1.abortEarly) {
           for (const key in input) if (!(key in this.entries)) {
             _addIssue(this, "key", dataset, config$1, {
@@ -74777,18 +76285,22 @@ function strictObject(entries$1, message$1) {
                 value: input[key]
               }]
             });
+
             break;
           }
         }
       } else _addIssue(this, "type", dataset, config$1);
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/strictObject/strictObjectAsync.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function strictObjectAsync(entries$1, message$1) {
   return {
     kind: "schema",
@@ -74798,11 +76310,14 @@ function strictObjectAsync(entries$1, message$1) {
     async: true,
     entries: entries$1,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     async "~run"(dataset, config$1) {
       const input = dataset.value;
+
       if (input && typeof input === "object") {
         dataset.typed = true;
         dataset.value = {};
@@ -74813,8 +76328,10 @@ function strictObjectAsync(entries$1, message$1) {
               value: value$1
             }, config$1)];
           }
+
           return [key, input[key], valueSchema, null];
         }));
+
         for (const [key, value$1, valueSchema, valueDataset] of valueDatasets) if (valueDataset) {
           if (valueDataset.issues) {
             const pathItem = {
@@ -74824,16 +76341,20 @@ function strictObjectAsync(entries$1, message$1) {
               key,
               value: value$1
             };
+
             for (const issue of valueDataset.issues) {
               if (issue.path) issue.path.unshift(pathItem);else issue.path = [pathItem];
               dataset.issues?.push(issue);
             }
+
             if (!dataset.issues) dataset.issues = valueDataset.issues;
+
             if (config$1.abortEarly) {
               dataset.typed = false;
               break;
             }
           }
+
           if (!valueDataset.typed) dataset.typed = false;
           dataset.value[key] = valueDataset.value;
         } else if (valueSchema.fallback !== void 0) dataset.value[key] = await /* @__PURE__ */getFallback(valueSchema);else if (valueSchema.type !== "exact_optional" && valueSchema.type !== "optional" && valueSchema.type !== "nullish") {
@@ -74848,8 +76369,10 @@ function strictObjectAsync(entries$1, message$1) {
               value: value$1
             }]
           });
+
           if (config$1.abortEarly) break;
         }
+
         if (!dataset.issues || !config$1.abortEarly) {
           for (const key in input) if (!(key in this.entries)) {
             _addIssue(this, "key", dataset, config$1, {
@@ -74863,18 +76386,22 @@ function strictObjectAsync(entries$1, message$1) {
                 value: input[key]
               }]
             });
+
             break;
           }
         }
       } else _addIssue(this, "type", dataset, config$1);
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/strictTuple/strictTuple.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function strictTuple(items, message$1) {
   return {
     kind: "schema",
@@ -74884,19 +76411,24 @@ function strictTuple(items, message$1) {
     async: false,
     items,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       const input = dataset.value;
+
       if (Array.isArray(input)) {
         dataset.typed = true;
         dataset.value = [];
+
         for (let key = 0; key < this.items.length; key++) {
           const value$1 = input[key];
           const itemDataset = this.items[key]["~run"]({
             value: value$1
           }, config$1);
+
           if (itemDataset.issues) {
             const pathItem = {
               type: "array",
@@ -74905,19 +76437,24 @@ function strictTuple(items, message$1) {
               key,
               value: value$1
             };
+
             for (const issue of itemDataset.issues) {
               if (issue.path) issue.path.unshift(pathItem);else issue.path = [pathItem];
               dataset.issues?.push(issue);
             }
+
             if (!dataset.issues) dataset.issues = itemDataset.issues;
+
             if (config$1.abortEarly) {
               dataset.typed = false;
               break;
             }
           }
+
           if (!itemDataset.typed) dataset.typed = false;
           dataset.value.push(itemDataset.value);
         }
+
         if (!(dataset.issues && config$1.abortEarly) && this.items.length < input.length) _addIssue(this, "type", dataset, config$1, {
           input: input[this.items.length],
           expected: "never",
@@ -74930,14 +76467,17 @@ function strictTuple(items, message$1) {
           }]
         });
       } else _addIssue(this, "type", dataset, config$1);
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/strictTuple/strictTupleAsync.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function strictTupleAsync(items, message$1) {
   return {
     kind: "schema",
@@ -74947,11 +76487,14 @@ function strictTupleAsync(items, message$1) {
     async: true,
     items,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     async "~run"(dataset, config$1) {
       const input = dataset.value;
+
       if (Array.isArray(input)) {
         dataset.typed = true;
         dataset.value = [];
@@ -74961,6 +76504,7 @@ function strictTupleAsync(items, message$1) {
             value: value$1
           }, config$1)];
         }));
+
         for (const [key, value$1, itemDataset] of itemDatasets) {
           if (itemDataset.issues) {
             const pathItem = {
@@ -74970,19 +76514,24 @@ function strictTupleAsync(items, message$1) {
               key,
               value: value$1
             };
+
             for (const issue of itemDataset.issues) {
               if (issue.path) issue.path.unshift(pathItem);else issue.path = [pathItem];
               dataset.issues?.push(issue);
             }
+
             if (!dataset.issues) dataset.issues = itemDataset.issues;
+
             if (config$1.abortEarly) {
               dataset.typed = false;
               break;
             }
           }
+
           if (!itemDataset.typed) dataset.typed = false;
           dataset.value.push(itemDataset.value);
         }
+
         if (!(dataset.issues && config$1.abortEarly) && this.items.length < input.length) _addIssue(this, "type", dataset, config$1, {
           input: input[this.items.length],
           expected: "never",
@@ -74995,14 +76544,17 @@ function strictTupleAsync(items, message$1) {
           }]
         });
       } else _addIssue(this, "type", dataset, config$1);
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/string/string.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function string(message$1) {
   return {
     kind: "schema",
@@ -75011,19 +76563,23 @@ function string(message$1) {
     expects: "string",
     async: false,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       if (typeof dataset.value === "string") dataset.typed = true;else _addIssue(this, "type", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/symbol/symbol.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function symbol(message$1) {
   return {
     kind: "schema",
@@ -75032,19 +76588,23 @@ function symbol(message$1) {
     expects: "symbol",
     async: false,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       if (typeof dataset.value === "symbol") dataset.typed = true;else _addIssue(this, "type", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/tuple/tuple.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function tuple(items, message$1) {
   return {
     kind: "schema",
@@ -75054,19 +76614,24 @@ function tuple(items, message$1) {
     async: false,
     items,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       const input = dataset.value;
+
       if (Array.isArray(input)) {
         dataset.typed = true;
         dataset.value = [];
+
         for (let key = 0; key < this.items.length; key++) {
           const value$1 = input[key];
           const itemDataset = this.items[key]["~run"]({
             value: value$1
           }, config$1);
+
           if (itemDataset.issues) {
             const pathItem = {
               type: "array",
@@ -75075,28 +76640,35 @@ function tuple(items, message$1) {
               key,
               value: value$1
             };
+
             for (const issue of itemDataset.issues) {
               if (issue.path) issue.path.unshift(pathItem);else issue.path = [pathItem];
               dataset.issues?.push(issue);
             }
+
             if (!dataset.issues) dataset.issues = itemDataset.issues;
+
             if (config$1.abortEarly) {
               dataset.typed = false;
               break;
             }
           }
+
           if (!itemDataset.typed) dataset.typed = false;
           dataset.value.push(itemDataset.value);
         }
       } else _addIssue(this, "type", dataset, config$1);
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/tuple/tupleAsync.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function tupleAsync(items, message$1) {
   return {
     kind: "schema",
@@ -75106,11 +76678,14 @@ function tupleAsync(items, message$1) {
     async: true,
     items,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     async "~run"(dataset, config$1) {
       const input = dataset.value;
+
       if (Array.isArray(input)) {
         dataset.typed = true;
         dataset.value = [];
@@ -75120,6 +76695,7 @@ function tupleAsync(items, message$1) {
             value: value$1
           }, config$1)];
         }));
+
         for (const [key, value$1, itemDataset] of itemDatasets) {
           if (itemDataset.issues) {
             const pathItem = {
@@ -75129,28 +76705,35 @@ function tupleAsync(items, message$1) {
               key,
               value: value$1
             };
+
             for (const issue of itemDataset.issues) {
               if (issue.path) issue.path.unshift(pathItem);else issue.path = [pathItem];
               dataset.issues?.push(issue);
             }
+
             if (!dataset.issues) dataset.issues = itemDataset.issues;
+
             if (config$1.abortEarly) {
               dataset.typed = false;
               break;
             }
           }
+
           if (!itemDataset.typed) dataset.typed = false;
           dataset.value.push(itemDataset.value);
         }
       } else _addIssue(this, "type", dataset, config$1);
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/tupleWithRest/tupleWithRest.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function tupleWithRest(items, rest, message$1) {
   return {
     kind: "schema",
@@ -75161,19 +76744,24 @@ function tupleWithRest(items, rest, message$1) {
     items,
     rest,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       const input = dataset.value;
+
       if (Array.isArray(input)) {
         dataset.typed = true;
         dataset.value = [];
+
         for (let key = 0; key < this.items.length; key++) {
           const value$1 = input[key];
           const itemDataset = this.items[key]["~run"]({
             value: value$1
           }, config$1);
+
           if (itemDataset.issues) {
             const pathItem = {
               type: "array",
@@ -75182,24 +76770,30 @@ function tupleWithRest(items, rest, message$1) {
               key,
               value: value$1
             };
+
             for (const issue of itemDataset.issues) {
               if (issue.path) issue.path.unshift(pathItem);else issue.path = [pathItem];
               dataset.issues?.push(issue);
             }
+
             if (!dataset.issues) dataset.issues = itemDataset.issues;
+
             if (config$1.abortEarly) {
               dataset.typed = false;
               break;
             }
           }
+
           if (!itemDataset.typed) dataset.typed = false;
           dataset.value.push(itemDataset.value);
         }
+
         if (!dataset.issues || !config$1.abortEarly) for (let key = this.items.length; key < input.length; key++) {
           const value$1 = input[key];
           const itemDataset = this.rest["~run"]({
             value: value$1
           }, config$1);
+
           if (itemDataset.issues) {
             const pathItem = {
               type: "array",
@@ -75208,28 +76802,35 @@ function tupleWithRest(items, rest, message$1) {
               key,
               value: value$1
             };
+
             for (const issue of itemDataset.issues) {
               if (issue.path) issue.path.unshift(pathItem);else issue.path = [pathItem];
               dataset.issues?.push(issue);
             }
+
             if (!dataset.issues) dataset.issues = itemDataset.issues;
+
             if (config$1.abortEarly) {
               dataset.typed = false;
               break;
             }
           }
+
           if (!itemDataset.typed) dataset.typed = false;
           dataset.value.push(itemDataset.value);
         }
       } else _addIssue(this, "type", dataset, config$1);
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/tupleWithRest/tupleWithRestAsync.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function tupleWithRestAsync(items, rest, message$1) {
   return {
     kind: "schema",
@@ -75240,11 +76841,14 @@ function tupleWithRestAsync(items, rest, message$1) {
     items,
     rest,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     async "~run"(dataset, config$1) {
       const input = dataset.value;
+
       if (Array.isArray(input)) {
         dataset.typed = true;
         dataset.value = [];
@@ -75258,6 +76862,7 @@ function tupleWithRestAsync(items, rest, message$1) {
             value: value$1
           }, config$1)];
         }))]);
+
         for (const [key, value$1, itemDataset] of normalDatasets) {
           if (itemDataset.issues) {
             const pathItem = {
@@ -75267,19 +76872,24 @@ function tupleWithRestAsync(items, rest, message$1) {
               key,
               value: value$1
             };
+
             for (const issue of itemDataset.issues) {
               if (issue.path) issue.path.unshift(pathItem);else issue.path = [pathItem];
               dataset.issues?.push(issue);
             }
+
             if (!dataset.issues) dataset.issues = itemDataset.issues;
+
             if (config$1.abortEarly) {
               dataset.typed = false;
               break;
             }
           }
+
           if (!itemDataset.typed) dataset.typed = false;
           dataset.value.push(itemDataset.value);
         }
+
         if (!dataset.issues || !config$1.abortEarly) for (const [key, value$1, itemDataset] of restDatasets) {
           if (itemDataset.issues) {
             const pathItem = {
@@ -75289,28 +76899,35 @@ function tupleWithRestAsync(items, rest, message$1) {
               key,
               value: value$1
             };
+
             for (const issue of itemDataset.issues) {
               if (issue.path) issue.path.unshift(pathItem);else issue.path = [pathItem];
               dataset.issues?.push(issue);
             }
+
             if (!dataset.issues) dataset.issues = itemDataset.issues;
+
             if (config$1.abortEarly) {
               dataset.typed = false;
               break;
             }
           }
+
           if (!itemDataset.typed) dataset.typed = false;
           dataset.value.push(itemDataset.value);
         }
       } else _addIssue(this, "type", dataset, config$1);
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/undefined/undefined.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function undefined_(message$1) {
   return {
     kind: "schema",
@@ -75319,19 +76936,23 @@ function undefined_(message$1) {
     expects: "undefined",
     async: false,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       if (dataset.value === void 0) dataset.typed = true;else _addIssue(this, "type", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/undefinedable/undefinedable.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function undefinedable(wrapped, default_) {
   return {
     kind: "schema",
@@ -75341,25 +76962,31 @@ function undefinedable(wrapped, default_) {
     async: false,
     wrapped,
     default: default_,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       if (dataset.value === void 0) {
         if (this.default !== void 0) dataset.value = /* @__PURE__ */getDefault(this, dataset, config$1);
+
         if (dataset.value === void 0) {
           dataset.typed = true;
           return dataset;
         }
       }
+
       return this.wrapped["~run"](dataset, config$1);
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/undefinedable/undefinedableAsync.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function undefinedableAsync(wrapped, default_) {
   return {
     kind: "schema",
@@ -75369,24 +76996,28 @@ function undefinedableAsync(wrapped, default_) {
     async: true,
     wrapped,
     default: default_,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     async "~run"(dataset, config$1) {
       if (dataset.value === void 0) {
         if (this.default !== void 0) dataset.value = await /* @__PURE__ */getDefault(this, dataset, config$1);
+
         if (dataset.value === void 0) {
           dataset.typed = true;
           return dataset;
         }
       }
+
       return this.wrapped["~run"](dataset, config$1);
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/union/utils/_subIssues/_subIssues.ts
+
 /**
 * Returns the sub issues of the provided datasets for the union issue.
 *
@@ -75396,16 +77027,20 @@ function undefinedableAsync(wrapped, default_) {
 *
 * @internal
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function _subIssues(datasets) {
   let issues;
   if (datasets) for (const dataset of datasets) if (issues) issues.push(...dataset.issues);else issues = dataset.issues;
   return issues;
-}
-
-//#endregion
+} //#endregion
 //#region src/schemas/union/union.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function union(options, message$1) {
   return {
     kind: "schema",
@@ -75415,13 +77050,16 @@ function union(options, message$1) {
     async: false,
     options,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       let validDataset;
       let typedDatasets;
       let untypedDatasets;
+
       for (const schema of this.options) {
         const optionDataset = schema["~run"]({
           value: dataset.value
@@ -75435,24 +77073,31 @@ function union(options, message$1) {
           }
         } else if (untypedDatasets) untypedDatasets.push(optionDataset);else untypedDatasets = [optionDataset];
       }
+
       if (validDataset) return validDataset;
+
       if (typedDatasets) {
         if (typedDatasets.length === 1) return typedDatasets[0];
+
         _addIssue(this, "type", dataset, config$1, {
           issues: /* @__PURE__ */_subIssues(typedDatasets)
         });
+
         dataset.typed = true;
       } else if (untypedDatasets?.length === 1) return untypedDatasets[0];else _addIssue(this, "type", dataset, config$1, {
         issues: /* @__PURE__ */_subIssues(untypedDatasets)
       });
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/union/unionAsync.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function unionAsync(options, message$1) {
   return {
     kind: "schema",
@@ -75462,13 +77107,16 @@ function unionAsync(options, message$1) {
     async: true,
     options,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     async "~run"(dataset, config$1) {
       let validDataset;
       let typedDatasets;
       let untypedDatasets;
+
       for (const schema of this.options) {
         const optionDataset = await schema["~run"]({
           value: dataset.value
@@ -75482,29 +77130,37 @@ function unionAsync(options, message$1) {
           }
         } else if (untypedDatasets) untypedDatasets.push(optionDataset);else untypedDatasets = [optionDataset];
       }
+
       if (validDataset) return validDataset;
+
       if (typedDatasets) {
         if (typedDatasets.length === 1) return typedDatasets[0];
+
         _addIssue(this, "type", dataset, config$1, {
           issues: /* @__PURE__ */_subIssues(typedDatasets)
         });
+
         dataset.typed = true;
       } else if (untypedDatasets?.length === 1) return untypedDatasets[0];else _addIssue(this, "type", dataset, config$1, {
         issues: /* @__PURE__ */_subIssues(untypedDatasets)
       });
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/unknown/unknown.ts
+
 /**
 * Creates a unknown schema.
 *
 * @returns A unknown schema.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function unknown() {
   return {
     kind: "schema",
@@ -75512,19 +77168,23 @@ function unknown() {
     reference: unknown,
     expects: "unknown",
     async: false,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset) {
       dataset.typed = true;
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/variant/variant.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function variant(key, options, message$1) {
   return {
     kind: "schema",
@@ -75535,23 +77195,29 @@ function variant(key, options, message$1) {
     key,
     options,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       const input = dataset.value;
+
       if (input && typeof input === "object") {
         let outputDataset;
         let maxDiscriminatorPriority = 0;
         let invalidDiscriminatorKey = this.key;
         let expectedDiscriminators = [];
+
         const parseOptions = (variant$1, allKeys) => {
           for (const schema of variant$1.options) {
             if (schema.type === "variant") parseOptions(schema, new Set(allKeys).add(schema.key));else {
               let keysAreValid = true;
               let currentPriority = 0;
+
               for (const currentKey of allKeys) {
                 const discriminatorSchema = schema.entries[currentKey];
+
                 if (currentKey in input ? discriminatorSchema["~run"]({
                   typed: false,
                   value: input[currentKey]
@@ -75559,16 +77225,20 @@ function variant(key, options, message$1) {
                   abortEarly: true
                 }).issues : discriminatorSchema.type !== "exact_optional" && discriminatorSchema.type !== "optional" && discriminatorSchema.type !== "nullish") {
                   keysAreValid = false;
+
                   if (invalidDiscriminatorKey !== currentKey && (maxDiscriminatorPriority < currentPriority || maxDiscriminatorPriority === currentPriority && currentKey in input && !(invalidDiscriminatorKey in input))) {
                     maxDiscriminatorPriority = currentPriority;
                     invalidDiscriminatorKey = currentKey;
                     expectedDiscriminators = [];
                   }
+
                   if (invalidDiscriminatorKey === currentKey) expectedDiscriminators.push(schema.entries[currentKey].expects);
                   break;
                 }
+
                 currentPriority++;
               }
+
               if (keysAreValid) {
                 const optionDataset = schema["~run"]({
                   value: input
@@ -75579,8 +77249,10 @@ function variant(key, options, message$1) {
             if (outputDataset && !outputDataset.issues) break;
           }
         };
+
         parseOptions(this, new Set([this.key]));
         if (outputDataset) return outputDataset;
+
         _addIssue(this, "type", dataset, config$1, {
           input: input[invalidDiscriminatorKey],
           expected: /* @__PURE__ */_joinExpects(expectedDiscriminators, "|"),
@@ -75593,14 +77265,17 @@ function variant(key, options, message$1) {
           }]
         });
       } else _addIssue(this, "type", dataset, config$1);
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/variant/variantAsync.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function variantAsync(key, options, message$1) {
   return {
     kind: "schema",
@@ -75611,23 +77286,29 @@ function variantAsync(key, options, message$1) {
     key,
     options,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     async "~run"(dataset, config$1) {
       const input = dataset.value;
+
       if (input && typeof input === "object") {
         let outputDataset;
         let maxDiscriminatorPriority = 0;
         let invalidDiscriminatorKey = this.key;
         let expectedDiscriminators = [];
+
         const parseOptions = async (variant$1, allKeys) => {
           for (const schema of variant$1.options) {
             if (schema.type === "variant") await parseOptions(schema, new Set(allKeys).add(schema.key));else {
               let keysAreValid = true;
               let currentPriority = 0;
+
               for (const currentKey of allKeys) {
                 const discriminatorSchema = schema.entries[currentKey];
+
                 if (currentKey in input ? (await discriminatorSchema["~run"]({
                   typed: false,
                   value: input[currentKey]
@@ -75635,16 +77316,20 @@ function variantAsync(key, options, message$1) {
                   abortEarly: true
                 })).issues : discriminatorSchema.type !== "exact_optional" && discriminatorSchema.type !== "optional" && discriminatorSchema.type !== "nullish") {
                   keysAreValid = false;
+
                   if (invalidDiscriminatorKey !== currentKey && (maxDiscriminatorPriority < currentPriority || maxDiscriminatorPriority === currentPriority && currentKey in input && !(invalidDiscriminatorKey in input))) {
                     maxDiscriminatorPriority = currentPriority;
                     invalidDiscriminatorKey = currentKey;
                     expectedDiscriminators = [];
                   }
+
                   if (invalidDiscriminatorKey === currentKey) expectedDiscriminators.push(schema.entries[currentKey].expects);
                   break;
                 }
+
                 currentPriority++;
               }
+
               if (keysAreValid) {
                 const optionDataset = await schema["~run"]({
                   value: input
@@ -75655,8 +77340,10 @@ function variantAsync(key, options, message$1) {
             if (outputDataset && !outputDataset.issues) break;
           }
         };
+
         await parseOptions(this, new Set([this.key]));
         if (outputDataset) return outputDataset;
+
         _addIssue(this, "type", dataset, config$1, {
           input: input[invalidDiscriminatorKey],
           expected: /* @__PURE__ */_joinExpects(expectedDiscriminators, "|"),
@@ -75669,14 +77356,17 @@ function variantAsync(key, options, message$1) {
           }]
         });
       } else _addIssue(this, "type", dataset, config$1);
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/schemas/void/void.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function void_(message$1) {
   return {
     kind: "schema",
@@ -75685,25 +77375,28 @@ function void_(message$1) {
     expects: "void",
     async: false,
     message: message$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       if (dataset.value === void 0) dataset.typed = true;else _addIssue(this, "type", dataset, config$1);
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/methods/keyof/keyof.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function keyof(schema, message$1) {
   return /* @__PURE__ */picklist(Object.keys(schema.entries), message$1);
-}
-
-//#endregion
+} //#endregion
 //#region src/methods/message/message.ts
+
 /**
 * Changes the local message configuration of a schema.
 *
@@ -75712,24 +77405,27 @@ function keyof(schema, message$1) {
 *
 * @returns The configured schema.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function message(schema, message_) {
-  return {
-    ...schema,
+  return { ...schema,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
-      return schema["~run"](dataset, {
-        ...config$1,
+      return schema["~run"](dataset, { ...config$1,
         message: message_
       });
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/methods/omit/omit.ts
+
 /**
 * Creates a modified copy of an object schema that does not contain the
 * selected entries.
@@ -75739,23 +77435,27 @@ function message(schema, message_) {
 *
 * @returns An object schema.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function omit(schema, keys) {
-  const entries$1 = {
-    ...schema.entries
+  const entries$1 = { ...schema.entries
   };
+
   for (const key of keys) delete entries$1[key];
-  return {
-    ...schema,
+
+  return { ...schema,
     entries: entries$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/methods/parse/parse.ts
+
 /**
 * Parses an unknown input based on a schema.
 *
@@ -75765,16 +77465,17 @@ function omit(schema, keys) {
 *
 * @returns The parsed input.
 */
+
+
 function parse(schema, input, config$1) {
   const dataset = schema["~run"]({
     value: input
   }, /* @__PURE__ */getGlobalConfig(config$1));
   if (dataset.issues) throw new ValiError(dataset.issues);
   return dataset.value;
-}
-
-//#endregion
+} //#endregion
 //#region src/methods/parse/parseAsync.ts
+
 /**
 * Parses an unknown input based on a schema.
 *
@@ -75784,66 +77485,79 @@ function parse(schema, input, config$1) {
 *
 * @returns The parsed input.
 */
+
+
 async function parseAsync(schema, input, config$1) {
   const dataset = await schema["~run"]({
     value: input
   }, /* @__PURE__ */getGlobalConfig(config$1));
   if (dataset.issues) throw new ValiError(dataset.issues);
   return dataset.value;
-}
-
-//#endregion
+} //#endregion
 //#region src/methods/parser/parser.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function parser(schema, config$1) {
   const func = input => parse(schema, input, config$1);
+
   func.schema = schema;
   func.config = config$1;
   return func;
-}
-
-//#endregion
+} //#endregion
 //#region src/methods/parser/parserAsync.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function parserAsync(schema, config$1) {
   const func = input => parseAsync(schema, input, config$1);
+
   func.schema = schema;
   func.config = config$1;
   return func;
-}
-
-//#endregion
+} //#endregion
 //#region src/methods/partial/partial.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function partial(schema, keys) {
   const entries$1 = {};
+
   for (const key in schema.entries) entries$1[key] = !keys || keys.includes(key) ? /* @__PURE__ */optional(schema.entries[key]) : schema.entries[key];
-  return {
-    ...schema,
+
+  return { ...schema,
     entries: entries$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/methods/partial/partialAsync.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function partialAsync(schema, keys) {
   const entries$1 = {};
+
   for (const key in schema.entries) entries$1[key] = !keys || keys.includes(key) ? /* @__PURE__ */optionalAsync(schema.entries[key]) : schema.entries[key];
-  return {
-    ...schema,
+
+  return { ...schema,
     entries: entries$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/methods/pick/pick.ts
+
 /**
 * Creates a modified copy of an object schema that contains only the selected
 * entries.
@@ -75853,102 +77567,125 @@ function partialAsync(schema, keys) {
 *
 * @returns An object schema.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function pick(schema, keys) {
   const entries$1 = {};
+
   for (const key of keys) entries$1[key] = schema.entries[key];
-  return {
-    ...schema,
+
+  return { ...schema,
     entries: entries$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/methods/pipe/pipe.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function pipe(...pipe$1) {
-  return {
-    ...pipe$1[0],
+  return { ...pipe$1[0],
     pipe: pipe$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     "~run"(dataset, config$1) {
       for (const item of pipe$1) if (item.kind !== "metadata") {
         if (dataset.issues && (item.kind === "schema" || item.kind === "transformation")) {
           dataset.typed = false;
           break;
         }
+
         if (!dataset.issues || !config$1.abortEarly && !config$1.abortPipeEarly) dataset = item["~run"](dataset, config$1);
       }
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/methods/pipe/pipeAsync.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function pipeAsync(...pipe$1) {
-  return {
-    ...pipe$1[0],
+  return { ...pipe$1[0],
     pipe: pipe$1,
     async: true,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     },
+
     async "~run"(dataset, config$1) {
       for (const item of pipe$1) if (item.kind !== "metadata") {
         if (dataset.issues && (item.kind === "schema" || item.kind === "transformation")) {
           dataset.typed = false;
           break;
         }
+
         if (!dataset.issues || !config$1.abortEarly && !config$1.abortPipeEarly) dataset = await item["~run"](dataset, config$1);
       }
+
       return dataset;
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/methods/required/required.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function required(schema, arg2, arg3) {
   const keys = Array.isArray(arg2) ? arg2 : void 0;
   const message$1 = Array.isArray(arg2) ? arg3 : arg2;
   const entries$1 = {};
+
   for (const key in schema.entries) entries$1[key] = !keys || keys.includes(key) ? /* @__PURE__ */nonOptional(schema.entries[key], message$1) : schema.entries[key];
-  return {
-    ...schema,
+
+  return { ...schema,
     entries: entries$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/methods/required/requiredAsync.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function requiredAsync(schema, arg2, arg3) {
   const keys = Array.isArray(arg2) ? arg2 : void 0;
   const message$1 = Array.isArray(arg2) ? arg3 : arg2;
   const entries$1 = {};
+
   for (const key in schema.entries) entries$1[key] = !keys || keys.includes(key) ? /* @__PURE__ */nonOptionalAsync(schema.entries[key], message$1) : schema.entries[key];
-  return {
-    ...schema,
+
+  return { ...schema,
     entries: entries$1,
+
     get "~standard"() {
       return /* @__PURE__ */_getStandardProps(this);
     }
-  };
-}
 
-//#endregion
+  };
+} //#endregion
 //#region src/methods/safeParse/safeParse.ts
+
 /**
 * Parses an unknown input based on a schema.
 *
@@ -75958,7 +77695,10 @@ function requiredAsync(schema, arg2, arg3) {
 *
 * @returns The parse result.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function safeParse(schema, input, config$1) {
   const dataset = schema["~run"]({
     value: input
@@ -75969,10 +77709,9 @@ function safeParse(schema, input, config$1) {
     output: dataset.value,
     issues: dataset.issues
   };
-}
-
-//#endregion
+} //#endregion
 //#region src/methods/safeParse/safeParseAsync.ts
+
 /**
 * Parses an unknown input based on a schema.
 *
@@ -75982,7 +77721,10 @@ function safeParse(schema, input, config$1) {
 *
 * @returns The parse result.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 async function safeParseAsync(schema, input, config$1) {
   const dataset = await schema["~run"]({
     value: input
@@ -75993,30 +77735,33 @@ async function safeParseAsync(schema, input, config$1) {
     output: dataset.value,
     issues: dataset.issues
   };
-}
-
-//#endregion
+} //#endregion
 //#region src/methods/safeParser/safeParser.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function safeParser(schema, config$1) {
   const func = input => /* @__PURE__ */safeParse(schema, input, config$1);
+
   func.schema = schema;
   func.config = config$1;
   return func;
-}
-
-//#endregion
+} //#endregion
 //#region src/methods/safeParser/safeParserAsync.ts
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function safeParserAsync(schema, config$1) {
   const func = input => /* @__PURE__ */safeParseAsync(schema, input, config$1);
+
   func.schema = schema;
   func.config = config$1;
   return func;
-}
-
-//#endregion
+} //#endregion
 //#region src/methods/summarize/summarize.ts
+
 /**
 * Summarize the error messages of issues in a pretty-printable multi-line string.
 *
@@ -76026,20 +77771,24 @@ function safeParserAsync(schema, config$1) {
 *
 * @beta
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function summarize(issues) {
   let summary = "";
+
   for (const issue of issues) {
     if (summary) summary += "\n";
     summary += `× ${issue.message}`;
     const dotPath = /* @__PURE__ */getDotPath(issue);
     if (dotPath) summary += `\n  → at ${dotPath}`;
   }
-  return summary;
-}
 
-//#endregion
+  return summary;
+} //#endregion
 //#region src/methods/unwrap/unwrap.ts
+
 /**
 * Unwraps the wrapped schema.
 *
@@ -76047,57 +77796,73 @@ function summarize(issues) {
 *
 * @returns The unwrapped schema.
 */
+
 /* @__NO_SIDE_EFFECTS__ */
+
+
 function unwrap(schema) {
   return schema.wrapped;
-}
-
-//#endregion
+} //#endregion
 
 },{}],320:[function(require,module,exports){
 (function (global){(function (){
 'use strict';
 
 var forEach = require('for-each');
+
 var availableTypedArrays = require('available-typed-arrays');
+
 var callBind = require('call-bind');
+
 var callBound = require('call-bound');
+
 var gOPD = require('gopd');
+
 var getProto = require('get-proto');
+
 var $toString = callBound('Object.prototype.toString');
+
 var hasToStringTag = require('has-tostringtag/shams')();
+
 var g = typeof globalThis === 'undefined' ? global : globalThis;
 var typedArrays = availableTypedArrays();
 var $slice = callBound('String.prototype.slice');
-
 /** @type {<T = unknown>(array: readonly T[], value: unknown) => number} */
+
 var $indexOf = callBound('Array.prototype.indexOf', true) || function indexOf(array, value) {
   for (var i = 0; i < array.length; i += 1) {
     if (array[i] === value) {
       return i;
     }
   }
+
   return -1;
 };
-
 /** @typedef {import('./types').Getter} Getter */
+
 /** @type {import('./types').Cache} */
+
+
 var cache = {
   __proto__: null
 };
+
 if (hasToStringTag && gOPD && getProto) {
   forEach(typedArrays, function (typedArray) {
     var arr = new g[typedArray]();
+
     if (Symbol.toStringTag in arr && getProto) {
-      var proto = getProto(arr);
-      // @ts-expect-error TS won't narrow inside a closure
+      var proto = getProto(arr); // @ts-expect-error TS won't narrow inside a closure
+
       var descriptor = gOPD(proto, Symbol.toStringTag);
+
       if (!descriptor && proto) {
-        var superProto = getProto(proto);
-        // @ts-expect-error TS won't narrow inside a closure
+        var superProto = getProto(proto); // @ts-expect-error TS won't narrow inside a closure
+
         descriptor = gOPD(superProto, Symbol.toStringTag);
-      }
-      // @ts-expect-error TODO: fix
+      } // @ts-expect-error TODO: fix
+
+
       cache['$' + typedArray] = callBind(descriptor.get);
     }
   });
@@ -76105,66 +77870,97 @@ if (hasToStringTag && gOPD && getProto) {
   forEach(typedArrays, function (typedArray) {
     var arr = new g[typedArray]();
     var fn = arr.slice || arr.set;
+
     if (fn) {
-      cache[(/** @type {`$${import('.').TypedArrayName}`} */'$' + typedArray)] = /** @type {import('./types').BoundSlice | import('./types').BoundSet} */
+      cache[
+      /** @type {`$${import('.').TypedArrayName}`} */
+      '$' + typedArray] =
+      /** @type {import('./types').BoundSlice | import('./types').BoundSet} */
       // @ts-expect-error TODO FIXME
       callBind(fn);
     }
   });
 }
-
 /** @type {(value: object) => false | import('.').TypedArrayName} */
+
+
 var tryTypedArrays = function tryAllTypedArrays(value) {
-  /** @type {ReturnType<typeof tryAllTypedArrays>} */var found = false;
-  forEach(/** @type {Record<`\$${import('.').TypedArrayName}`, Getter>} */cache, /** @type {(getter: Getter, name: `\$${import('.').TypedArrayName}`) => void} */
+  /** @type {ReturnType<typeof tryAllTypedArrays>} */
+  var found = false;
+  forEach(
+  /** @type {Record<`\$${import('.').TypedArrayName}`, Getter>} */
+  cache,
+  /** @type {(getter: Getter, name: `\$${import('.').TypedArrayName}`) => void} */
   function (getter, typedArray) {
     if (!found) {
       try {
         // @ts-expect-error a throw is fine here
         if ('$' + getter(value) === typedArray) {
-          found = /** @type {import('.').TypedArrayName} */$slice(typedArray, 1);
+          found =
+          /** @type {import('.').TypedArrayName} */
+          $slice(typedArray, 1);
         }
-      } catch (e) {/**/}
+      } catch (e) {
+        /**/
+      }
     }
   });
   return found;
 };
-
 /** @type {(value: object) => false | import('.').TypedArrayName} */
+
+
 var trySlices = function tryAllSlices(value) {
-  /** @type {ReturnType<typeof tryAllSlices>} */var found = false;
-  forEach(/** @type {Record<`\$${import('.').TypedArrayName}`, Getter>} */cache, /** @type {(getter: Getter, name: `\$${import('.').TypedArrayName}`) => void} */function (getter, name) {
+  /** @type {ReturnType<typeof tryAllSlices>} */
+  var found = false;
+  forEach(
+  /** @type {Record<`\$${import('.').TypedArrayName}`, Getter>} */
+  cache,
+  /** @type {(getter: Getter, name: `\$${import('.').TypedArrayName}`) => void} */
+  function (getter, name) {
     if (!found) {
       try {
         // @ts-expect-error a throw is fine here
         getter(value);
-        found = /** @type {import('.').TypedArrayName} */$slice(name, 1);
-      } catch (e) {/**/}
+        found =
+        /** @type {import('.').TypedArrayName} */
+        $slice(name, 1);
+      } catch (e) {
+        /**/
+      }
     }
   });
   return found;
 };
-
 /** @type {import('.')} */
+
+
 module.exports = function whichTypedArray(value) {
   if (!value || typeof value !== 'object') {
     return false;
   }
+
   if (!hasToStringTag) {
     /** @type {string} */
     var tag = $slice($toString(value), 8, -1);
+
     if ($indexOf(typedArrays, tag) > -1) {
       return tag;
     }
+
     if (tag !== 'Object') {
       return false;
-    }
-    // node < 0.6 hits here on real Typed Arrays
+    } // node < 0.6 hits here on real Typed Arrays
+
+
     return trySlices(value);
   }
+
   if (!gOPD) {
     return null;
   } // unknown engine
+
+
   return tryTypedArrays(value);
 };
 
@@ -76176,6 +77972,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
+
 // base-x encoding / decoding
 // Copyright (c) 2018 base-x contributors
 // Copyright (c) 2014-2018 The Bitcoin Core developers (base58.cpp)
@@ -76185,22 +77982,30 @@ function base(ALPHABET) {
   if (ALPHABET.length >= 255) {
     throw new TypeError('Alphabet too long');
   }
+
   const BASE_MAP = new Uint8Array(256);
+
   for (let j = 0; j < BASE_MAP.length; j++) {
     BASE_MAP[j] = 255;
   }
+
   for (let i = 0; i < ALPHABET.length; i++) {
     const x = ALPHABET.charAt(i);
     const xc = x.charCodeAt(0);
+
     if (BASE_MAP[xc] !== 255) {
       throw new TypeError(x + ' is ambiguous');
     }
+
     BASE_MAP[xc] = i;
   }
+
   const BASE = ALPHABET.length;
   const LEADER = ALPHABET.charAt(0);
   const FACTOR = Math.log(BASE) / Math.log(256); // log(BASE) / log(256), rounded up
+
   const iFACTOR = Math.log(256) / Math.log(BASE); // log(256) / log(BASE), rounded up
+
   function encode(source) {
     // eslint-disable-next-line no-empty
     if (source instanceof Uint8Array) {} else if (ArrayBuffer.isView(source)) {
@@ -76208,121 +78013,155 @@ function base(ALPHABET) {
     } else if (Array.isArray(source)) {
       source = Uint8Array.from(source);
     }
+
     if (!(source instanceof Uint8Array)) {
       throw new TypeError('Expected Uint8Array');
     }
+
     if (source.length === 0) {
       return '';
-    }
-    // Skip & count leading zeroes.
+    } // Skip & count leading zeroes.
+
+
     let zeroes = 0;
     let length = 0;
     let pbegin = 0;
     const pend = source.length;
+
     while (pbegin !== pend && source[pbegin] === 0) {
       pbegin++;
       zeroes++;
-    }
-    // Allocate enough space in big-endian base58 representation.
+    } // Allocate enough space in big-endian base58 representation.
+
+
     const size = (pend - pbegin) * iFACTOR + 1 >>> 0;
-    const b58 = new Uint8Array(size);
-    // Process the bytes.
+    const b58 = new Uint8Array(size); // Process the bytes.
+
     while (pbegin !== pend) {
-      let carry = source[pbegin];
-      // Apply "b58 = b58 * 256 + ch".
+      let carry = source[pbegin]; // Apply "b58 = b58 * 256 + ch".
+
       let i = 0;
+
       for (let it1 = size - 1; (carry !== 0 || i < length) && it1 !== -1; it1--, i++) {
         carry += 256 * b58[it1] >>> 0;
         b58[it1] = carry % BASE >>> 0;
         carry = carry / BASE >>> 0;
       }
+
       if (carry !== 0) {
         throw new Error('Non-zero carry');
       }
+
       length = i;
       pbegin++;
-    }
-    // Skip leading zeroes in base58 result.
+    } // Skip leading zeroes in base58 result.
+
+
     let it2 = size - length;
+
     while (it2 !== size && b58[it2] === 0) {
       it2++;
-    }
-    // Translate the result into a string.
+    } // Translate the result into a string.
+
+
     let str = LEADER.repeat(zeroes);
+
     for (; it2 < size; ++it2) {
       str += ALPHABET.charAt(b58[it2]);
     }
+
     return str;
   }
+
   function decodeUnsafe(source) {
     if (typeof source !== 'string') {
       throw new TypeError('Expected String');
     }
+
     if (source.length === 0) {
       return new Uint8Array();
     }
-    let psz = 0;
-    // Skip and count leading '1's.
+
+    let psz = 0; // Skip and count leading '1's.
+
     let zeroes = 0;
     let length = 0;
+
     while (source[psz] === LEADER) {
       zeroes++;
       psz++;
-    }
-    // Allocate enough space in big-endian base256 representation.
+    } // Allocate enough space in big-endian base256 representation.
+
+
     const size = (source.length - psz) * FACTOR + 1 >>> 0; // log(58) / log(256), rounded up.
-    const b256 = new Uint8Array(size);
-    // Process the characters.
+
+    const b256 = new Uint8Array(size); // Process the characters.
+
     while (psz < source.length) {
       // Find code of next character
-      const charCode = source.charCodeAt(psz);
-      // Base map can not be indexed using char code
+      const charCode = source.charCodeAt(psz); // Base map can not be indexed using char code
+
       if (charCode > 255) {
         return;
-      }
-      // Decode character
-      let carry = BASE_MAP[charCode];
-      // Invalid character
+      } // Decode character
+
+
+      let carry = BASE_MAP[charCode]; // Invalid character
+
       if (carry === 255) {
         return;
       }
+
       let i = 0;
+
       for (let it3 = size - 1; (carry !== 0 || i < length) && it3 !== -1; it3--, i++) {
         carry += BASE * b256[it3] >>> 0;
         b256[it3] = carry % 256 >>> 0;
         carry = carry / 256 >>> 0;
       }
+
       if (carry !== 0) {
         throw new Error('Non-zero carry');
       }
+
       length = i;
       psz++;
-    }
-    // Skip leading zeroes in b256.
+    } // Skip leading zeroes in b256.
+
+
     let it4 = size - length;
+
     while (it4 !== size && b256[it4] === 0) {
       it4++;
     }
+
     const vch = new Uint8Array(zeroes + (size - it4));
     let j = zeroes;
+
     while (it4 !== size) {
       vch[j++] = b256[it4++];
     }
+
     return vch;
   }
+
   function decode(string) {
     const buffer = decodeUnsafe(string);
+
     if (buffer) {
       return buffer;
     }
+
     throw new Error('Non-base' + BASE + ' character');
   }
+
   return {
     encode,
     decodeUnsafe,
     decode
   };
 }
+
 var _default = base;
 exports.default = _default;
 
@@ -76333,10 +78172,15 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
+
 var _baseX = _interopRequireDefault(require("base-x"));
-function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 var ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+
 var _default = (0, _baseX.default)(ALPHABET);
+
 exports.default = _default;
 
 },{"base-x":321}],323:[function(require,module,exports){
@@ -76346,8 +78190,11 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = _default;
+
 var _bs = _interopRequireDefault(require("bs58"));
-function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function _default(checksumFn) {
   // Encode a buffer as a base58-check encoded string
   function encode(payload) {
@@ -76359,26 +78206,32 @@ function _default(checksumFn) {
     both.set(checksum.subarray(0, 4), payloadU8.length);
     return _bs.default.encode(both);
   }
+
   function decodeRaw(buffer) {
     var payload = buffer.slice(0, -4);
     var checksum = buffer.slice(-4);
-    var newChecksum = checksumFn(payload);
-    // eslint-disable-next-line
+    var newChecksum = checksumFn(payload); // eslint-disable-next-line
+
     if (checksum[0] ^ newChecksum[0] | checksum[1] ^ newChecksum[1] | checksum[2] ^ newChecksum[2] | checksum[3] ^ newChecksum[3]) return;
     return payload;
-  }
-  // Decode a base58-check encoded string to a buffer, no result if checksum is wrong
+  } // Decode a base58-check encoded string to a buffer, no result if checksum is wrong
+
+
   function decodeUnsafe(str) {
     var buffer = _bs.default.decodeUnsafe(str);
+
     if (buffer == null) return;
     return decodeRaw(buffer);
   }
+
   function decode(str) {
     var buffer = _bs.default.decode(str);
+
     var payload = decodeRaw(buffer);
     if (payload == null) throw new Error('Invalid checksum');
     return payload;
   }
+
   return {
     encode: encode,
     decode: decode,
@@ -76393,14 +78246,20 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
+
 var _sha = require("@noble/hashes/sha256");
+
 var _base = _interopRequireDefault(require("./base.js"));
-function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 // SHA256(SHA256(buffer))
 function sha256x2(buffer) {
   return (0, _sha.sha256)((0, _sha.sha256)(buffer));
 }
+
 var _default = (0, _base.default)(sha256x2);
+
 exports.default = _default;
 
 },{"./base.js":323,"@noble/hashes/sha256":238}],325:[function(require,module,exports){
@@ -76409,26 +78268,30 @@ exports.default = _default;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.decodeRaw = decodeRaw;
-exports.encodeRaw = encodeRaw;
 exports.decode = decode;
+exports.decodeRaw = decodeRaw;
 exports.encode = encode;
+exports.encodeRaw = encodeRaw;
+
 var _bs58check = _interopRequireDefault(require("bs58check"));
-function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function decodeRaw(buffer, version) {
   // check version only if defined
-  if (version !== undefined && buffer[0] !== version) throw new Error('Invalid network version');
-  // uncompressed
+  if (version !== undefined && buffer[0] !== version) throw new Error('Invalid network version'); // uncompressed
+
   if (buffer.length === 33) {
     return {
       version: buffer[0],
       privateKey: buffer.slice(1, 33),
       compressed: false
     };
-  }
-  // invalid length
-  if (buffer.length !== 34) throw new Error('Invalid WIF length');
-  // invalid compression flag
+  } // invalid length
+
+
+  if (buffer.length !== 34) throw new Error('Invalid WIF length'); // invalid compression flag
+
   if (buffer[33] !== 0x01) throw new Error('Invalid compression flag');
   return {
     version: buffer[0],
@@ -76436,20 +78299,25 @@ function decodeRaw(buffer, version) {
     compressed: true
   };
 }
+
 function encodeRaw(version, privateKey, compressed) {
   if (privateKey.length !== 32) throw new TypeError('Invalid privateKey length');
   var result = new Uint8Array(compressed ? 34 : 33);
   var view = new DataView(result.buffer);
   view.setUint8(0, version);
   result.set(privateKey, 1);
+
   if (compressed) {
     result[33] = 0x01;
   }
+
   return result;
 }
+
 function decode(str, version) {
   return decodeRaw(_bs58check.default.decode(str), version);
 }
+
 function encode(wif) {
   return _bs58check.default.encode(encodeRaw(wif.version, wif.privateKey, wif.compressed));
 }
@@ -76462,6 +78330,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.NETWORK_TYPES = void 0;
+
 /*
   This script uses version bytes as described in SLIP-132
   https://github.com/satoshilabs/slips/blob/master/slip-0132.md
@@ -76590,19 +78459,18 @@ function byteArrayToHexString(byteArray) {
     return ('0' + (_byte & 0xFF).toString(16)).slice(-2);
   }).join('');
 }
-
 /*
  * This function takes an extended public key (with any version bytes, it doesn't need to be an xpub)
  * and converts it to an extended public key formatted with the desired version bytes
  * @param xpub: an extended public key in base58 format. Example: xpub6CpihtY9HVc1jNJWCiXnRbpXm5BgVNKqZMsM4XqpDcQigJr6AHNwaForLZ3kkisDcRoaXSUms6DJNhxFtQGeZfWAQWCZQe1esNetx5Wqe4M
  * @param targetFormat: a string representing the desired prefix; must exist in the "prefixes" mapping defined above. Example: Zpub
 */
+
 global.changeVersionBytes = function (xpub, targetFormat) {
   if (!prefixes.has(targetFormat)) {
     return "Invalid target version";
-  }
+  } // trim whitespace
 
-  // trim whitespace
   xpub = xpub.trim();
   try {
     var data = b58.decode(xpub);
